@@ -1,0 +1,21 @@
+# Local environment files and logs
+.env
+.env.*
+!.env.example
+/server/.env
+/server/*.log
+*.log
+
+# Dependencies
+node_modules/
+
+# Generated build output and tool caches
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
