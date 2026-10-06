@@ -4,6 +4,8 @@ import { IUser } from '../models/User';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_super_secret_jwt_key_2026';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+const isProduction = process.env.NODE_ENV === 'production';
+const cookieSameSite = isProduction ? ('none' as const) : ('lax' as const);
 
 export const sendTokenResponse = (user: IUser, statusCode: number, res: Response) => {
   const token = jwt.sign(
@@ -15,8 +17,8 @@ export const sendTokenResponse = (user: IUser, statusCode: number, res: Response
   const cookieOptions = {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? ('strict' as const) : ('lax' as const),
+    secure: isProduction,
+    sameSite: cookieSameSite,
     path: '/'
   };
 
@@ -45,6 +47,8 @@ export const clearTokenResponse = (res: Response) => {
   res.cookie('token', 'none', {
     expires: new Date(Date.now() - 10000),
     httpOnly: true,
+    secure: isProduction,
+    sameSite: cookieSameSite,
     path: '/'
   });
 };
