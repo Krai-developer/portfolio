@@ -170,6 +170,16 @@ npm run dev
 The frontend starts after the API is healthy. MongoDB must be running locally (or `MONGODB_URI` must point to an available database). You can still run `npm run dev:server` and `npm run dev:client` separately when needed.
 Visit `http://localhost:5173` in your browser.
 
+### 5. Deployment API Configuration
+
+When the frontend and API are deployed separately, set the frontend build environment variable
+`VITE_API_BASE_URL` to the backend URL ending in `/api` (for example,
+`https://your-api.example.com/api`) and redeploy the frontend. Set the backend `CLIENT_URL` to the
+exact deployed frontend origin (for example, `https://your-site.example.com`) and configure its
+production MongoDB URI, JWT secret, and email credentials in the backend host's environment settings.
+The API must also be deployed with this repository's latest server code. An unset frontend API URL
+works with the local Vite proxy, but in production it sends `/api` requests to the frontend host.
+
 ---
 
 ## 🔑 Pre-Configured Demo Accounts

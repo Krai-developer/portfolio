@@ -1,6 +1,7 @@
 import { ApiResponse, PortfolioStats } from '../types';
 
-const BASE_URL = '/api';
+// Locally Vite proxies /api to Express; deployments can point directly at the API host.
+const BASE_URL = (import.meta.env.VITE_API_BASE_URL?.trim() || '/api').replace(/\/+$/, '');
 
 interface RequestOptions extends RequestInit {
   data?: any;
@@ -39,7 +40,9 @@ export const request = async <T = any>(
     try {
       result = JSON.parse(responseText) as ApiResponse<T>;
     } catch {
-      throw new Error(`The server returned an unreadable response (status ${response.status}).`);
+      throw new Error(
+        `The API returned a non-JSON response (HTTP ${response.status}). Check VITE_API_BASE_URL and confirm the backend is deployed.`
+      );
     }
 
     if (!response.ok) {
