@@ -24,9 +24,9 @@ export const authenticateUser = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    let token = req.cookies?.token;
+    let token = req.cookies?.token && req.cookies.token !== 'none' ? req.cookies.token : undefined;
 
-    // Optional Bearer token header fallback for API clients / tools
+    // Optional Bearer token header fallback for API clients / cross-origin browsers
     if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
     }

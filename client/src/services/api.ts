@@ -2,6 +2,32 @@ import { ApiResponse, PortfolioStats } from '../types';
 
 // Locally Vite proxies /api to Express; deployments can point directly at the API host.
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL?.trim() || '/api').replace(/\/+$/, '');
+const TOKEN_STORAGE_KEY = 'portfolio_auth_token';
+
+const getStoredToken = (): string | null => {
+  try {
+    return localStorage.getItem(TOKEN_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+};
+
+const setStoredToken = (token?: string) => {
+  if (!token) return;
+  try {
+    localStorage.setItem(TOKEN_STORAGE_KEY, token);
+  } catch {
+    // Ignore storage errors in restricted environments
+  }
+};
+
+const clearStoredToken = () => {
+  try {
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+  } catch {
+    // Ignore storage errors in restricted environments
+  }
+};
 
 interface RequestOptions extends RequestInit {
   data?: any;
@@ -12,12 +38,14 @@ export const request = async <T = any>(
   options: RequestOptions = {}
 ): Promise<ApiResponse<T>> => {
   const { data, headers, ...customConfig } = options;
+  const storedToken = getStoredToken();
 
   const config: RequestInit = {
     method: data ? 'POST' : 'GET',
     credentials: 'include', // Essential for HTTP-only cookies
     headers: {
       'Content-Type': 'application/json',
+      ...(storedToken ? { Authorization: `Bearer ${storedToken}` } : {}),
       ...headers
     },
     ...customConfig
@@ -46,6 +74,9 @@ export const request = async <T = any>(
     }
 
     if (!response.ok) {
+      if (response.status === 401) {
+        clearStoredToken();
+      }
       throw new Error(result.message || `Request failed with status ${response.status}`);
     }
 
@@ -59,16 +90,27 @@ export const request = async <T = any>(
 export const api = {
   // Auth
   auth: {
-    login: (credentials: { email: string; password: string }, portal: 'client' | 'admin') =>
-      request('/auth/login', { data: { ...credentials, portal } }),
-    register: (userData: any) =>
-      request('/auth/register', { data: userData }),
+    login: async (credentials: { email: string; password: string }, portal: 'client' | 'admin') => {
+      const res = await request('/auth/login', { data: { ...credentials, portal } });
+      if (res.token) setStoredToken(res.token);
+      return res;
+    },
+    register: async (userData: any) => {
+      const res = await request('/auth/register', { data: userData });
+      if (res.token) setStoredToken(res.token);
+      return res;
+    },
     requestPasswordReset: (email: string) =>
       request('/auth/forgot-password', { data: { email } }),
     resetPassword: (data: { token: string; password: string; confirmPassword: string }) =>
       request('/auth/reset-password', { data }),
-    logout: () =>
-      request('/auth/logout', { method: 'POST' }),
+    logout: async () => {
+      try {
+        return await request('/auth/logout', { method: 'POST' });
+      } finally {
+        clearStoredToken();
+      }
+    },
     me: () =>
       request('/auth/me'),
     updateProfile: (profileData: any) =>
