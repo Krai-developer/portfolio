@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar } from '../components/common/Navbar';
 import { Footer } from '../components/common/Footer';
 import { GeometricBackground } from '../components/common/GeometricBackground';
@@ -8,6 +8,18 @@ import { Settings } from '../types';
 
 export const PublicLayout: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const element = document.querySelector(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }, [pathname, hash]);
 
   useEffect(() => {
     const fetchSettings = async () => {

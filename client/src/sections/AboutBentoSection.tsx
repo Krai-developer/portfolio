@@ -12,7 +12,7 @@ import {
 export const AboutBentoSection: React.FC = () => {
   return (
     <section id="about" className="relative pb-24 pt-8 sm:pt-10 lg:pt-12">
-      <div className="w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-accent-muted border border-accent/30 text-xs font-mono text-accent">

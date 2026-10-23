@@ -40,7 +40,7 @@ export const ContactSection: React.FC = () => {
 
   return (
     <section id="contact" className="py-24 relative">
-      <div className="w-full">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="glass-panel p-8 sm:p-14 rounded-3xl border border-dark-border relative overflow-hidden">
           <div className="text-center max-w-xl mx-auto mb-10 space-y-3">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-accent-muted border border-accent/30 text-xs font-mono text-accent">
