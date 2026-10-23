@@ -27,6 +27,7 @@ export const ProjectDetailPage: React.FC = () => {
         const res = await api.public.getProjectBySlug(slug);
         if (res.success && res.data) {
           setProject(res.data);
+          document.title = `${res.data.title} — KraiDev`;
         } else {
           setError('Project not found or is private.');
         }
@@ -37,6 +38,10 @@ export const ProjectDetailPage: React.FC = () => {
       }
     };
     fetchProject();
+
+    return () => {
+      document.title = 'KraiDev — Maron Jake Dinopol | Freelance Full-Stack Developer';
+    };
   }, [slug]);
 
   if (loading) {

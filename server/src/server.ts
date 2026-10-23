@@ -98,6 +98,14 @@ connectDB().then(async () => {
     Settings.updateMany(
       { name: 'Alex Rivera' },
       { $set: { name: 'Maron Jake Dinopol' } }
+    ),
+    Settings.updateMany(
+      { email: 'alex@rivera.dev' },
+      { $set: { email: 'cloudyuu124@gmail.com' } }
+    ),
+    Settings.updateMany(
+      { 'socialLinks.github': 'https://github.com' },
+      { $set: { 'socialLinks.github': 'https://github.com/ForFunn-gg' } }
     )
   ]);
 

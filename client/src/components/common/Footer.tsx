@@ -28,7 +28,11 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
             </p>
             <div className="flex items-center space-x-4 pt-2">
               <a
-                href={settings?.socialLinks?.github || 'https://github.com'}
+                href={
+                  settings?.socialLinks?.github && settings.socialLinks.github !== 'https://github.com'
+                    ? settings.socialLinks.github
+                    : 'https://github.com/ForFunn-gg'
+                }
                 target="_blank"
                 rel="noreferrer"
                 className="w-9 h-9 rounded-lg bg-dark-card border border-dark-border flex items-center justify-center text-content-secondary hover:text-white hover:border-accent transition-all"

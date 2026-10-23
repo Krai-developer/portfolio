@@ -1,4 +1,4 @@
-# Studio Alex Rivera — Freelance Portfolio & Client Management Platform
+# KraiDev Studio — Freelance Portfolio & Client Management Platform
 
 A production-ready full-stack digital studio portfolio and client freelance management platform built for a student freelancer targeting tech startups, high-growth modern brands, small businesses, and digital agencies.
 
@@ -268,4 +268,4 @@ The admin password is kept on the server and is never embedded in the frontend.
 ---
 
 ## 📄 License
-MIT © 2026 Alex Rivera Studio. Built with React, TypeScript, Node.js, and MongoDB.
+MIT © 2026 KraiDev Studio (Maron Jake Dinopol). Built with React, TypeScript, Node.js, and MongoDB.

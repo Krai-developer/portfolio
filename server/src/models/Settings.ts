@@ -69,7 +69,7 @@ const SettingsSchema = new Schema<ISettings>(
     },
     email: {
       type: String,
-      default: 'alex@rivera.dev'
+      default: 'cloudyuu124@gmail.com'
     },
     phone: {
       type: String,
@@ -80,7 +80,7 @@ const SettingsSchema = new Schema<ISettings>(
       default: 'San Francisco, CA / Remote'
     },
     socialLinks: {
-      github: { type: String, default: 'https://github.com' },
+      github: { type: String, default: 'https://github.com/ForFunn-gg' },
       linkedin: { type: String, default: 'https://linkedin.com' },
       twitter: { type: String, default: 'https://twitter.com' },
       dribbble: { type: String, default: 'https://dribbble.com' }
