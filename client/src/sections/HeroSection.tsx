@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Settings } from '../types';
 import { HeroStats } from '../components/common/HeroStats';
-import heroVideo from '../assets/hero-videos/01-workflow-pipeline.mp4';
+import { HeroVideoCarousel } from '../components/common/HeroVideoCarousel';
 
 interface HeroSectionProps {
   settings?: Settings | null;
@@ -35,15 +35,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
     : `${availabilityPeriod} Openings`;
 
   return (
-    <section className="relative overflow-hidden pb-4 pt-6 sm:pb-6 sm:pt-8 lg:pb-8 lg:pt-10">
-      <video
-        src={heroVideo}
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover -z-10"
-      />
+    <section className="relative overflow-hidden pb-12 pt-6 sm:pb-14 sm:pt-8 lg:pb-16 lg:pt-10">
+      <HeroVideoCarousel />
       <div className="absolute inset-0 bg-black/60" aria-hidden="true" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

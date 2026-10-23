@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 
 const videoFiles = import.meta.glob<string>('../../assets/hero-videos/*.{mp4,webm,ogg}', {
   eager: true,
@@ -55,11 +54,7 @@ export const HeroVideoCarousel: React.FC = () => {
   }, [readyIndex, targetIndex]);
 
   if (videos.length === 0) {
-    return (
-      <div className="flex aspect-video w-full items-center justify-center rounded-l-2xl border-y border-l border-white/10 bg-dark-surface px-6 text-center text-sm text-content-muted">
-        Add .mp4, .webm, or .ogg videos to <code className="mx-1 text-accent">src/assets/hero-videos</code> to show them here.
-      </div>
-    );
+    return null;
   }
 
   const activeVideo = videos[activeIndex];
@@ -71,43 +66,42 @@ export const HeroVideoCarousel: React.FC = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 24, scale: 0.985 }}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
-      transition={{ duration: 0.75, delay: 0.15, ease: 'easeOut' }}
-      className="group relative aspect-video w-full overflow-hidden rounded-l-2xl border-y border-l border-white/10 bg-dark-surface shadow-[0_24px_80px_-28px_rgba(0,0,0,0.8)] md:rounded-r-none md:border-r-0"
-      aria-roledescription="carousel"
-      aria-label="Portfolio videos"
-    >
-      {videos.map((video, index) => {
-        const isActive = index === activeIndex;
-        const isNext = index === nextIndex;
-        if (!isActive && !isNext) return null;
+    <>
+      <div
+        className="absolute inset-0 -z-10 h-full w-full overflow-hidden"
+        aria-roledescription="carousel"
+        aria-label="Portfolio videos"
+      >
+        {videos.map((video, index) => {
+          const isActive = index === activeIndex;
+          const isNext = index === nextIndex;
+          if (!isActive && !isNext) return null;
 
-        return (
-          <video
-            key={video.src}
-            ref={isNext && !isActive ? nextVideoRef : undefined}
-            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ${
-              isActive ? 'z-0 opacity-100' : 'z-0 opacity-0 pointer-events-none'
-            }`}
-            src={video.src}
-            autoPlay={isActive}
-            loop={isActive && videos.length === 1}
-            onEnded={isActive && videos.length > 1 ? () => setTargetIndex(nextIndex) : undefined}
-            onCanPlay={isNext && !isActive ? () => setReadyIndex(index) : undefined}
-            muted
-            playsInline
-            preload="auto"
-            aria-label={video.label}
-            aria-hidden={!isActive}
-          />
-        );
-      })}
+          return (
+            <video
+              key={video.src}
+              ref={isNext && !isActive ? nextVideoRef : undefined}
+              className={`absolute inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ${
+                isActive ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+              src={video.src}
+              autoPlay={isActive}
+              loop={isActive && videos.length === 1}
+              onEnded={isActive && videos.length > 1 ? () => setTargetIndex(nextIndex) : undefined}
+              onCanPlay={isNext && !isActive ? () => setReadyIndex(index) : undefined}
+              muted
+              playsInline
+              preload="auto"
+              aria-label={video.label}
+              aria-hidden={!isActive}
+            />
+          );
+        })}
+      </div>
 
       {showControls && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center bg-gradient-to-t from-black/70 via-black/30 to-transparent px-4 pb-3 pt-10 sm:pb-4">
-          <div className="flex items-center gap-2" role="group" aria-label="Choose a video">
+        <div className=" absolute inset-x-0 bottom-3 z-20 flex items-center justify-center px-4">
+          <div className="flex items-center gap-2 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-sm" role="group" aria-label="Choose a video">
             {videos.map((video, index) => (
               <button
                 key={video.src}
@@ -129,6 +123,6 @@ export const HeroVideoCarousel: React.FC = () => {
           </span>
         </div>
       )}
-    </motion.div>
+    </>
   );
 };
