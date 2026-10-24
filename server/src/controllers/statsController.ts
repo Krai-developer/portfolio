@@ -26,63 +26,53 @@ export const getPublicStats = async (_req: Request, res: Response): Promise<void
       return;
     }
 
-    const countedProjectsFilter = {
-      $or: [
-        { published: true, isPrivate: false },
-        { status: 'completed' },
-        { includeInStats: true }
-      ]
-    };
-
-    const [projects, skillsCount] = await Promise.all([
-      Project.find(countedProjectsFilter)
-        .select('status progress published projectType technologies')
+    const [allProjects, skillsCount] = await Promise.all([
+      Project.find({})
+        .select('status progress published isPrivate projectType includeInStats technologies')
         .lean(),
       Skill.countDocuments()
     ]);
 
-    const projectsCompleted = projects.length;
+    const countedProjects = allProjects.filter(
+      (p) => (p.published && !p.isPrivate) || p.status === 'completed' || p.includeInStats
+    );
+
+    const projectsCompleted = countedProjects.length;
 
     // Count unique technologies across Skills collection and built Projects
     const projectTechSet = new Set<string>();
-    for (const p of projects) {
+    for (const p of allProjects) {
       for (const tech of p.technologies || []) {
         if (tech?.trim()) projectTechSet.add(tech.trim().toLowerCase());
       }
     }
     const technologiesCount = Math.max(skillsCount, projectTechSet.size);
 
-    // Calculate real-time delivery & dedication percentage from project progress
-    let computedDedication = 100;
-    if (projects.length > 0) {
-      const totalScore = projects.reduce((sum, p) => {
-        if (p.status === 'completed' || (p.published && p.projectType === 'portfolio')) {
-          return sum + 100;
-        }
-        return sum + Math.max(75, p.progress || 85);
+    // Real-time Dedication to Growth: average completion/progress rate across all projects
+    // Completed projects count as 100%; active projects contribute their live progress (0-100%)
+    let computedDedication = 0;
+    if (allProjects.length > 0) {
+      const totalProgress = allProjects.reduce((sum, p) => {
+        if (p.status === 'completed') return sum + 100;
+        const progress = typeof p.progress === 'number' ? Math.min(100, Math.max(0, p.progress)) : 0;
+        return sum + progress;
       }, 0);
-      computedDedication = Math.round(totalScore / projects.length);
+      computedDedication = Math.round(totalProgress / allProjects.length);
     }
-
-    const savedDedication =
-      typeof settings?.dedicationPercentage === 'number' && settings.dedicationPercentage >= 50
-        ? settings.dedicationPercentage
-        : computedDedication;
 
     const computed = {
       yearsLearning: completedYears(settings?.learningStartDate),
       projectsCompleted,
       technologiesCount,
       happyClients: technologiesCount,
-      dedication: projects.length > 0 ? computedDedication : savedDedication
+      dedication: computedDedication
     };
 
     const rawOverrides = settings?.statsOverrides || {};
     const validOverrides = Object.fromEntries(
       Object.entries(rawOverrides).filter(([key, value]) => {
         if (typeof value !== 'number' || value <= 0) return false;
-        // Ignore accidental tiny dedication override like 2%
-        if (key === 'dedication' && value < 50) return false;
+        if (key === 'dedication' && value === 2) return false;
         return true;
       })
     );

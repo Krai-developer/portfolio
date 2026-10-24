@@ -8,7 +8,7 @@ const metrics = [
   { key: 'projectsCompleted', label: 'Projects Built', suffix: '+', icon: BriefcaseBusiness },
   { key: 'technologiesCount', fallbackKey: 'happyClients', label: 'Technologies Used', suffix: '+', icon: Cpu },
   { key: 'yearsLearning', label: 'Years of Learning', suffix: '+', icon: BookOpen },
-  { key: 'dedication', label: 'Project Dedication', suffix: '%', icon: TrendingUp }
+  { key: 'dedication', label: 'Dedication to Growth', suffix: '%', icon: TrendingUp }
 ] as const;
 
 const AnimatedValue: React.FC<{ value: number; suffix: string }> = ({ value, suffix }) => {
