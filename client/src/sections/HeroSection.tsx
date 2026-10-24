@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Settings } from '../types';
 import { HeroStats } from '../components/common/HeroStats';
@@ -23,6 +23,14 @@ const heroDescription =
   'I’m a Computer Engineering student and freelance developer. I work with you to plan, build, and polish websites and web apps, and keep you in the loop along the way.';
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start']
+  });
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.07]);
+  const bgOpacity = useTransform(scrollYProgress, [0, 0.85, 1], [1, 0.35, 0]);
+
   const savedHeadline = settings?.heroHeadline?.trim();
   const savedDescription = settings?.heroDescription?.trim();
   const headline = savedHeadline && savedHeadline !== oldDefaultHeadline ? savedHeadline : heroHeadline;
@@ -35,9 +43,26 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
     : `${availabilityPeriod} Openings`;
 
   return (
-    <section className="relative overflow-hidden pb-12 pt-6 sm:pb-14 sm:pt-8 lg:pb-16 lg:pt-10">
-      <HeroVideoCarousel />
-      <div className="absolute inset-0 bg-black/60" aria-hidden="true" />
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden pb-16 pt-6 sm:pb-20 sm:pt-8 lg:pb-24 lg:pt-10"
+    >
+      <motion.div
+        style={{ scale: bgScale, opacity: bgOpacity }}
+        className="absolute inset-0 -z-10"
+      >
+        <HeroVideoCarousel />
+      </motion.div>
+
+      {/* Seamless Dark + White Smoke vignette that blends into #0B0B0F with zero separation */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0B0B0F]/70 via-[#0B0B0F]/60 to-[#0B0B0F]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0B0B0F] via-[#0B0B0F]/90 to-transparent"
+        aria-hidden="true"
+      />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative z-10 flex flex-col items-start text-left">

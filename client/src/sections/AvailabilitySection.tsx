@@ -1,6 +1,7 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Settings } from '../types';
-import { Clock, Calendar, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Clock, Calendar, ArrowRight } from 'lucide-react';
 
 interface AvailabilitySectionProps {
   settings?: Settings | null;
@@ -10,8 +11,14 @@ export const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({ settin
   return (
     <section className="py-16 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="glass-panel p-8 sm:p-12 rounded-3xl border border-dark-border relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="glass-panel p-8 sm:p-12 rounded-3xl border border-dark-border relative overflow-hidden"
+        >
+          <div className="absolute -top-16 -right-16 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
             {/* Status overview */}
@@ -60,7 +67,7 @@ export const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({ settin
               </a>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

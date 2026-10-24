@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { api } from '../services/api';
 import { Project } from '../types';
 import { ExternalLink, Github, ArrowRight, FolderKanban } from 'lucide-react';
@@ -35,7 +36,13 @@ export const ProjectsSection: React.FC = () => {
   return (
     <section id="work" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6"
+        >
           <div className="space-y-4 max-w-xl">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-accent-muted border border-accent/30 text-xs font-mono text-accent">
               <FolderKanban className="w-3.5 h-3.5" />
@@ -68,7 +75,7 @@ export const ProjectsSection: React.FC = () => {
               ))}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -80,9 +87,14 @@ export const ProjectsSection: React.FC = () => {
           <div className="text-center py-16 text-content-muted">New projects are on the way.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {filteredProjects.map((project) => (
-              <div
+            {filteredProjects.map((project, index) => (
+              <motion.div
                 key={project._id}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.5, delay: (index % 2) * 0.1, ease: 'easeOut' }}
                 className="glass-panel rounded-2xl border border-dark-border overflow-hidden hover:border-accent/40 transition-all group flex flex-col"
               >
                 {/* Image Showcase */}
@@ -168,7 +180,7 @@ export const ProjectsSection: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

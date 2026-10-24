@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { api } from '../services/api';
 import { Send, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 
@@ -41,7 +42,13 @@ export const ContactSection: React.FC = () => {
   return (
     <section id="contact" className="py-24 relative">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="glass-panel p-8 sm:p-14 rounded-3xl border border-dark-border relative overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="glass-panel p-8 sm:p-14 rounded-3xl border border-dark-border relative overflow-hidden"
+        >
           <div className="text-center max-w-xl mx-auto mb-10 space-y-3">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-accent-muted border border-accent/30 text-xs font-mono text-accent">
               <Sparkles className="w-3.5 h-3.5" />
@@ -143,7 +150,7 @@ export const ContactSection: React.FC = () => {
               </div>
             </form>
           )}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

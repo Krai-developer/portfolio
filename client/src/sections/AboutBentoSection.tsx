@@ -14,7 +14,13 @@ export const AboutBentoSection: React.FC = () => {
     <section id="about" className="relative pb-24 pt-8 sm:pt-10 lg:pt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="text-center max-w-2xl mx-auto mb-16 space-y-4"
+        >
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-accent-muted border border-accent/30 text-xs font-mono text-accent">
             <GraduationCap className="w-3.5 h-3.5" />
             <span>A LITTLE ABOUT ME</span>
@@ -26,17 +32,20 @@ export const AboutBentoSection: React.FC = () => {
             I’m a Computer Engineering student and freelance developer. I enjoy turning ideas into useful
             websites, learning as I go, and paying attention to the details people use every day.
           </p>
-        </div>
+        </motion.div>
 
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {/* Card 1: Fast Learner & Modern Stack (2 cols on lg) */}
           <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
             whileHover={{ y: -4 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
             className="lg:col-span-2 glass-panel p-8 rounded-2xl border border-dark-border relative overflow-hidden group"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-2xl group-hover:bg-accent/20 transition-all pointer-events-none" />
+            <div className="absolute -top-10 -right-10 w-48 h-48 bg-accent/10 rounded-full blur-3xl group-hover:bg-accent/15 transition-all pointer-events-none" />
             <div className="w-12 h-12 rounded-xl bg-accent-muted border border-accent/30 flex items-center justify-center text-accent mb-6">
               <Zap className="w-6 h-6" />
             </div>
@@ -62,8 +71,11 @@ export const AboutBentoSection: React.FC = () => {
 
           {/* Card 2: Direct Communication (1 col) */}
           <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
             whileHover={{ y: -4 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.08, ease: 'easeOut' }}
             className="glass-panel p-8 rounded-2xl border border-dark-border relative overflow-hidden group flex flex-col justify-between"
           >
             <div>
@@ -77,14 +89,17 @@ export const AboutBentoSection: React.FC = () => {
               </p>
             </div>
             <div className="pt-6">
-            <p className="text-xs font-mono text-accent">Clear updates along the way &rarr;</p>
+              <p className="text-xs font-mono text-accent">Clear updates along the way &rarr;</p>
             </div>
           </motion.div>
 
           {/* Card 3: Production Security Rigor (1 col) */}
           <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
             whileHover={{ y: -4 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.16, ease: 'easeOut' }}
             className="glass-panel p-8 rounded-2xl border border-dark-border relative overflow-hidden group flex flex-col justify-between"
           >
             <div>
@@ -106,8 +121,11 @@ export const AboutBentoSection: React.FC = () => {
 
           {/* Card 4: Built-in Client Portal (1 col) */}
           <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
             whileHover={{ y: -4 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.08, ease: 'easeOut' }}
             className="glass-panel p-8 rounded-2xl border border-dark-border relative overflow-hidden group"
           >
             <div className="w-12 h-12 rounded-xl bg-accent-muted border border-accent/30 flex items-center justify-center text-accent mb-6">
@@ -122,8 +140,11 @@ export const AboutBentoSection: React.FC = () => {
 
           {/* Card 5: Creative Developer Polish (3 cols on lg) */}
           <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
             whileHover={{ y: -4 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.16, ease: 'easeOut' }}
             className="lg:col-span-3 glass-panel p-8 rounded-2xl border border-dark-border relative overflow-hidden group"
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">

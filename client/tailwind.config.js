@@ -12,19 +12,19 @@ export default {
           bg: '#0B0B0F',
           surface: '#111116',
           card: '#15151B',
-          border: '#23232D',
-          hover: '#1B1B24'
+          border: '#24242E',
+          hover: '#1C1C24'
         },
         accent: {
-          DEFAULT: '#00E676',
-          hover: '#00C853',
-          glow: 'rgba(0, 230, 118, 0.25)',
-          muted: 'rgba(0, 230, 118, 0.1)'
+          DEFAULT: '#F5F5F5',
+          hover: '#E2E2E8',
+          glow: 'rgba(245, 245, 245, 0.22)',
+          muted: 'rgba(245, 245, 245, 0.08)'
         },
         content: {
-          primary: '#FFFFFF',
-          secondary: '#A1A1AA',
-          muted: '#71717A'
+          primary: '#F5F5F5',
+          secondary: '#B4B4BE',
+          muted: '#787884'
         }
       },
       fontFamily: {
@@ -32,9 +32,9 @@ export default {
         mono: ['JetBrains Mono', 'Fira Code', 'monospace']
       },
       boxShadow: {
-        'emerald-glow': '0 0 25px -5px rgba(0, 230, 118, 0.3)',
-        'emerald-sm': '0 0 12px -2px rgba(0, 230, 118, 0.25)',
-        'card-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+        'emerald-glow': '0 0 28px -5px rgba(245, 245, 245, 0.22)',
+        'emerald-sm': '0 0 14px -2px rgba(245, 245, 245, 0.18)',
+        'card-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.45)'
       },
       animation: {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',

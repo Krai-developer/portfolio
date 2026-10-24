@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { api } from '../services/api';
 import { Service } from '../types';
-import { Layout, Palette, Cpu, Zap, Layers, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Layout, Palette, Cpu, Zap, Layers, ArrowRight } from 'lucide-react';
 
 export const ServicesSection: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
@@ -41,7 +42,13 @@ export const ServicesSection: React.FC = () => {
   return (
     <section id="services" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="text-center max-w-2xl mx-auto mb-16 space-y-4"
+        >
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-accent-muted border border-accent/30 text-xs font-mono text-accent">
             <Layers className="w-3.5 h-3.5" />
             <span>SERVICES &amp; DELIVERABLES</span>
@@ -53,7 +60,7 @@ export const ServicesSection: React.FC = () => {
             High-impact freelance engagements designed for fast delivery, clean architecture, and
             delightful user experience.
           </p>
-        </div>
+        </motion.div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -63,12 +70,17 @@ export const ServicesSection: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service) => (
-              <div
+            {services.map((service, index) => (
+              <motion.div
                 key={service._id}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.5, delay: index * 0.08, ease: 'easeOut' }}
                 className="glass-panel p-8 rounded-2xl border border-dark-border hover:border-accent/40 transition-all flex flex-col justify-between group relative overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full blur-xl group-hover:bg-accent/15 transition-all pointer-events-none" />
+                <div className="absolute -top-8 -right-8 w-36 h-36 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/15 transition-all pointer-events-none" />
                 <div>
                   <div className="w-12 h-12 rounded-xl bg-accent-muted border border-accent/30 flex items-center justify-center text-accent mb-6 group-hover:scale-105 transition-transform">
                     {getServiceIcon(service.icon)}
@@ -106,7 +118,7 @@ export const ServicesSection: React.FC = () => {
                     <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

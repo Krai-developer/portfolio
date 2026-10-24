@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { api } from '../services/api';
 import { Skill } from '../types';
-import { Code, Server, Database, Sparkles, Terminal, Wrench, Layers } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 
 export const TechStackSection: React.FC = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -49,13 +50,13 @@ export const TechStackSection: React.FC = () => {
 
   return (
     <section className="py-20 relative overflow-hidden">
-      {/* Infinite Marquee strip */}
-      <div className="w-full border-y border-dark-border/60 bg-dark-surface/40 backdrop-blur-md py-4 mb-20 overflow-hidden select-none">
+      {/* Infinite Marquee strip - seamlessly edge-faded with no hard borders */}
+      <div className="w-full py-5 mb-20 overflow-hidden select-none [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
         <div className="flex w-[200%] animate-marquee space-x-12 items-center">
           {[...marqueeTech, ...marqueeTech].map((tech, idx) => (
             <div key={idx} className="flex items-center space-x-3 text-content-secondary whitespace-nowrap">
-              <span className="w-2 h-2 rounded-full bg-accent" />
-              <span className="font-mono text-sm tracking-wider uppercase text-white font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent/70" />
+              <span className="font-mono text-sm tracking-wider uppercase text-content-primary/90 font-medium">
                 {tech}
               </span>
             </div>
@@ -64,7 +65,13 @@ export const TechStackSection: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="text-center max-w-2xl mx-auto mb-12 space-y-4"
+        >
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-accent-muted border border-accent/30 text-xs font-mono text-accent">
             <Terminal className="w-3.5 h-3.5" />
             <span>TECHNICAL CAPABILITIES</span>
@@ -75,7 +82,7 @@ export const TechStackSection: React.FC = () => {
           <p className="text-content-secondary text-base">
             Every layer selected for performance, developer velocity, and maintainability.
           </p>
-        </div>
+        </motion.div>
 
         {/* Category Tabs */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
@@ -105,9 +112,14 @@ export const TechStackSection: React.FC = () => {
           <div className="text-center py-12 text-content-muted">No skills found in this category.</div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredSkills.map((skill) => (
-              <div
+            {filteredSkills.map((skill, index) => (
+              <motion.div
                 key={skill._id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.4, delay: (index % 4) * 0.05, ease: 'easeOut' }}
                 className="glass-panel p-5 rounded-xl border border-dark-border hover:border-accent/40 transition-all group flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between mb-3">
@@ -118,9 +130,12 @@ export const TechStackSection: React.FC = () => {
                 </div>
                 <div>
                   <div className="w-full bg-dark-surface h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-accent h-full rounded-full transition-all duration-700"
-                      style={{ width: `${skill.proficiency}%` }}
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${skill.proficiency}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.85, delay: 0.1, ease: 'easeOut' }}
+                      className="bg-gradient-to-r from-white/50 to-accent h-full rounded-full"
                     />
                   </div>
                   <div className="flex items-center justify-between mt-2">
@@ -134,7 +149,7 @@ export const TechStackSection: React.FC = () => {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import {
   Menu,
@@ -25,6 +26,12 @@ export const Navbar: React.FC<NavbarProps> = ({ settings }) => {
   const location = useLocation();
 
   const isHome = location.pathname === '/';
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 110,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   const navLinks = [
     { name: 'About', href: isHome ? '#about' : '/#about' },
@@ -34,7 +41,12 @@ export const Navbar: React.FC<NavbarProps> = ({ settings }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-dark-border/60 bg-dark-bg/80 backdrop-blur-xl transition-all duration-300">
+    <header className="sticky top-0 z-50 w-full border-b border-white/[0.05] bg-gradient-to-b from-[#0B0B0F]/90 to-[#0B0B0F]/70 backdrop-blur-xl transition-all duration-300">
+      <motion.div
+        style={{ scaleX }}
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[1.5px] origin-left bg-gradient-to-r from-white/10 via-[#F5F5F5]/80 to-white/30"
+        aria-hidden="true"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Brand Logo */}
