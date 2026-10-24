@@ -106,6 +106,14 @@ connectDB().then(async () => {
     Settings.updateMany(
       { 'socialLinks.github': 'https://github.com' },
       { $set: { 'socialLinks.github': 'https://github.com/ForFunn-gg' } }
+    ),
+    Settings.updateMany(
+      { dedicationPercentage: { $lt: 50 } },
+      { $set: { dedicationPercentage: 100 }, $unset: { statsOverrides: 1 } }
+    ),
+    Settings.updateMany(
+      { 'statsOverrides.dedication': { $lt: 50 } },
+      { $unset: { statsOverrides: 1 } }
     )
   ]);
 

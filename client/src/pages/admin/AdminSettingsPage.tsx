@@ -207,9 +207,9 @@ export const AdminSettingsPage: React.FC = () => {
             <p className="mb-3 text-xs text-content-muted">Leave a field blank to use its calculated value.</p>
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               {([
+                ['projectsCompleted', 'Projects built'],
+                ['happyClients', 'Technologies used'],
                 ['yearsLearning', 'Years learning'],
-                ['projectsCompleted', 'Projects completed'],
-                ['happyClients', 'Happy clients'],
                 ['dedication', 'Dedication %']
               ] as const).map(([key, label]) => (
                 <label key={key} className="text-xs text-content-muted">

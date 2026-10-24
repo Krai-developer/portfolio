@@ -177,6 +177,7 @@ export interface PortfolioStats {
   enabled: boolean;
   yearsLearning: number;
   projectsCompleted: number;
+  technologiesCount?: number;
   happyClients: number;
   dedication: number;
 }
