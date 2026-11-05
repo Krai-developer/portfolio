@@ -81,10 +81,10 @@ export const AdminLayout: React.FC = () => {
         <div className="h-20 flex items-center px-6 border-b border-dark-border/60 justify-between">
           <Link to="/" className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg bg-accent text-black flex items-center justify-center font-mono font-bold text-sm shadow-emerald-sm">
-              AR
+              KD
             </div>
             <div>
-              <span className="font-bold text-sm text-white block">Studio Admin</span>
+              <span className="font-bold text-sm text-white block">KraiDev Admin</span>
               <span className="text-[10px] font-mono text-accent block">SUPERUSER RBAC</span>
             </div>
           </Link>

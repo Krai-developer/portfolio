@@ -2,7 +2,27 @@ import { Request, Response } from 'express';
 import { Project } from '../models/Project';
 import { ProjectMilestone } from '../models/ProjectMilestone';
 import { ProjectFile } from '../models/ProjectFile';
+import { Message } from '../models/Message';
 import { AuthRequest } from '../middleware/auth';
+
+const syncProjectProgressFromMilestones = async (projectId: any) => {
+  const milestones = await ProjectMilestone.find({ projectId }).lean();
+  if (milestones.length === 0) return;
+
+  const totalScore = milestones.reduce((sum, m) => {
+    if (m.status === 'completed') return sum + 100;
+    if (m.status === 'in-progress') return sum + 50;
+    return sum;
+  }, 0);
+
+  const computedProgress = Math.round(totalScore / milestones.length);
+  const allCompleted = milestones.every((m) => m.status === 'completed');
+
+  await Project.findByIdAndUpdate(projectId, {
+    progress: computedProgress,
+    ...(allCompleted ? { status: 'completed' } : {})
+  });
+};
 
 // Helper to make slug
 const slugify = (text: string) => {
@@ -171,7 +191,7 @@ export const createProject = async (req: AuthRequest, res: Response): Promise<vo
       clientId: clientId || null,
       projectType: projectType || 'portfolio',
       status: status || 'planning',
-      progress: typeof progress === 'number' ? progress : 0,
+      progress: status === 'completed' ? 100 : typeof progress === 'number' ? progress : 0,
       featured: Boolean(featured),
       published: published !== undefined ? Boolean(published) : true,
       isPrivate: Boolean(isPrivate),
@@ -258,7 +278,12 @@ export const updateProject = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-    const updated = await Project.findByIdAndUpdate(id, req.body, {
+    const updatePayload = { ...req.body };
+    if (updatePayload.status === 'completed') {
+      updatePayload.progress = 100;
+    }
+
+    const updated = await Project.findByIdAndUpdate(id, updatePayload, {
       new: true,
       runValidators: true
     }).populate('clientId', 'name email');
@@ -292,8 +317,11 @@ export const deleteProject = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     await Project.findByIdAndDelete(id);
-    await ProjectMilestone.deleteMany({ projectId: id });
-    await ProjectFile.deleteMany({ projectId: id });
+    await Promise.all([
+      ProjectMilestone.deleteMany({ projectId: id }),
+      ProjectFile.deleteMany({ projectId: id }),
+      Message.deleteMany({ projectId: id })
+    ]);
 
     res.status(200).json({
       success: true,
@@ -329,6 +357,8 @@ export const createMilestone = async (req: AuthRequest, res: Response): Promise<
       order: typeof order === 'number' ? order : 0
     });
 
+    await syncProjectProgressFromMilestones(projectId);
+
     res.status(201).json({ success: true, data: milestone });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to create milestone.' });
@@ -353,6 +383,8 @@ export const updateMilestone = async (req: AuthRequest, res: Response): Promise<
       return;
     }
 
+    await syncProjectProgressFromMilestones(milestone.projectId);
+
     res.status(200).json({ success: true, data: milestone });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to update milestone.' });
@@ -362,7 +394,10 @@ export const updateMilestone = async (req: AuthRequest, res: Response): Promise<
 export const deleteMilestone = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { milestoneId } = req.params;
-    await ProjectMilestone.findByIdAndDelete(milestoneId);
+    const milestone = await ProjectMilestone.findByIdAndDelete(milestoneId);
+    if (milestone) {
+      await syncProjectProgressFromMilestones(milestone.projectId);
+    }
     res.status(200).json({ success: true, message: 'Milestone removed.' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to delete milestone.' });

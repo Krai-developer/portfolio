@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../services/api';
-import { Project, User } from '../../types';
+import { Project, ProjectFile, ProjectMilestone, User } from '../../types';
 import {
-  FolderKanban,
   Plus,
   Trash2,
   Edit2,
-  ExternalLink,
   Eye,
   EyeOff,
   Star,
-  CheckCircle,
   X,
   Search,
-  Filter
+  ListChecks,
+  FileText
 } from 'lucide-react';
 
 export const AdminProjectsPage: React.FC = () => {
@@ -26,6 +24,14 @@ export const AdminProjectsPage: React.FC = () => {
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+
+  // Milestones & Files Workspace Modal State
+  const [workspaceProject, setWorkspaceProject] = useState<Project | null>(null);
+  const [milestones, setMilestones] = useState<ProjectMilestone[]>([]);
+  const [files, setFiles] = useState<ProjectFile[]>([]);
+  const [workspaceLoading, setWorkspaceLoading] = useState(false);
+  const [newMilestone, setNewMilestone] = useState({ title: '', description: '', dueDate: '' });
+  const [newFile, setNewFile] = useState({ name: '', url: '', type: 'document' });
 
   // Form State
   const [formData, setFormData] = useState({
@@ -46,7 +52,10 @@ export const AdminProjectsPage: React.FC = () => {
     isPrivate: false,
     includeInStats: false,
     problem: '',
-    solution: ''
+    solution: '',
+    features: '',
+    processNotes: '',
+    screenshots: ''
   });
 
   const fetchProjects = async () => {
@@ -91,7 +100,10 @@ export const AdminProjectsPage: React.FC = () => {
       isPrivate: false,
       includeInStats: false,
       problem: '',
-      solution: ''
+      solution: '',
+      features: '',
+      processNotes: '',
+      screenshots: ''
     });
     setModalOpen(true);
   };
@@ -119,7 +131,10 @@ export const AdminProjectsPage: React.FC = () => {
       isPrivate: project.isPrivate,
       includeInStats: project.includeInStats || false,
       problem: project.problem || '',
-      solution: project.solution || ''
+      solution: project.solution || '',
+      features: project.features?.join('\n') || '',
+      processNotes: project.processNotes?.join('\n') || '',
+      screenshots: project.screenshots?.join('\n') || ''
     });
     setModalOpen(true);
   };
@@ -129,9 +144,22 @@ export const AdminProjectsPage: React.FC = () => {
 
     const payload = {
       ...formData,
+      progress: formData.status === 'completed' ? 100 : formData.progress,
       technologies: formData.technologies
         .split(',')
         .map((t) => t.trim())
+        .filter(Boolean),
+      features: formData.features
+        .split('\n')
+        .map((f) => f.trim())
+        .filter(Boolean),
+      processNotes: formData.processNotes
+        .split('\n')
+        .map((n) => n.trim())
+        .filter(Boolean),
+      screenshots: formData.screenshots
+        .split(/[\n,]+/)
+        .map((s) => s.trim())
         .filter(Boolean),
       clientId: formData.projectType === 'client' && formData.clientId ? formData.clientId : null
     };
@@ -174,6 +202,82 @@ export const AdminProjectsPage: React.FC = () => {
       fetchProjects();
     } catch (err: any) {
       alert('Failed to update featured state');
+    }
+  };
+
+  const openWorkspaceModal = async (project: Project) => {
+    setWorkspaceProject(project);
+    setWorkspaceLoading(true);
+    try {
+      const res = await api.admin.getProjectById(project._id);
+      if (res.success && res.data) {
+        setMilestones(res.data.milestones || []);
+        setFiles(res.data.files || []);
+      }
+    } catch (err) {
+      console.error('Failed to load project workspace:', err);
+    } finally {
+      setWorkspaceLoading(false);
+    }
+  };
+
+  const handleAddMilestone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!workspaceProject || !newMilestone.title.trim()) return;
+    try {
+      await api.admin.createMilestone(workspaceProject._id, {
+        ...newMilestone,
+        order: milestones.length + 1
+      });
+      setNewMilestone({ title: '', description: '', dueDate: '' });
+      await openWorkspaceModal(workspaceProject);
+      fetchProjects();
+    } catch (err: any) {
+      alert(err.message || 'Failed to add milestone.');
+    }
+  };
+
+  const handleMilestoneStatus = async (milestone: ProjectMilestone, status: ProjectMilestone['status']) => {
+    if (!workspaceProject) return;
+    try {
+      await api.admin.updateMilestone(milestone._id, { status });
+      await openWorkspaceModal(workspaceProject);
+      fetchProjects();
+    } catch (err: any) {
+      alert(err.message || 'Failed to update milestone.');
+    }
+  };
+
+  const handleDeleteMilestone = async (milestoneId: string) => {
+    if (!workspaceProject) return;
+    try {
+      await api.admin.deleteMilestone(milestoneId);
+      await openWorkspaceModal(workspaceProject);
+      fetchProjects();
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete milestone.');
+    }
+  };
+
+  const handleAddFile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!workspaceProject || !newFile.name.trim() || !newFile.url.trim()) return;
+    try {
+      await api.admin.uploadFile(workspaceProject._id, newFile);
+      setNewFile({ name: '', url: '', type: 'document' });
+      await openWorkspaceModal(workspaceProject);
+    } catch (err: any) {
+      alert(err.message || 'Failed to attach file.');
+    }
+  };
+
+  const handleDeleteFile = async (fileId: string) => {
+    if (!workspaceProject) return;
+    try {
+      await api.admin.deleteFile(fileId);
+      await openWorkspaceModal(workspaceProject);
+    } catch (err: any) {
+      alert(err.message || 'Failed to remove file.');
     }
   };
 
@@ -347,6 +451,13 @@ export const AdminProjectsPage: React.FC = () => {
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end space-x-2">
                         <button
+                          onClick={() => openWorkspaceModal(p)}
+                          className="p-1.5 rounded-lg bg-dark-card hover:bg-dark-hover border border-dark-border text-content-secondary hover:text-accent"
+                          title="Manage Milestones & Deliverables"
+                        >
+                          <ListChecks className="w-3.5 h-3.5" />
+                        </button>
+                        <button
                           onClick={() => openEditModal(p)}
                           className="p-1.5 rounded-lg bg-dark-card hover:bg-dark-hover border border-dark-border text-content-secondary hover:text-white"
                           title="Edit Project"
@@ -506,7 +617,14 @@ export const AdminProjectsPage: React.FC = () => {
                   </label>
                   <select
                     value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    onChange={(e) => {
+                      const nextStatus = e.target.value;
+                      setFormData({
+                        ...formData,
+                        status: nextStatus,
+                        progress: nextStatus === 'completed' ? 100 : formData.progress
+                      });
+                    }}
                     className="w-full px-3 py-2 rounded-xl bg-dark-surface border border-dark-border text-white text-sm"
                   >
                     <option value="planning">Planning</option>
@@ -528,8 +646,15 @@ export const AdminProjectsPage: React.FC = () => {
                     min="0"
                     max="100"
                     value={formData.progress}
-                    onChange={(e) => setFormData({ ...formData, progress: Number(e.target.value) })}
-                    className="w-full mt-2 accent-emerald-500"
+                    onChange={(e) => {
+                      const nextProgress = Number(e.target.value);
+                      setFormData({
+                        ...formData,
+                        progress: nextProgress,
+                        status: nextProgress === 100 ? 'completed' : formData.status
+                      });
+                    }}
+                    className="w-full mt-2 accent-white"
                   />
                 </div>
 
@@ -539,7 +664,7 @@ export const AdminProjectsPage: React.FC = () => {
                       type="checkbox"
                       checked={formData.published}
                       onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-                      className="accent-emerald-500"
+                      className="accent-white"
                     />
                     <span>Published</span>
                   </label>
@@ -548,7 +673,7 @@ export const AdminProjectsPage: React.FC = () => {
                       type="checkbox"
                       checked={formData.featured}
                       onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                      className="accent-emerald-500"
+                      className="accent-white"
                     />
                     <span>Featured</span>
                   </label>
@@ -557,7 +682,7 @@ export const AdminProjectsPage: React.FC = () => {
                       type="checkbox"
                       checked={formData.includeInStats}
                       onChange={(e) => setFormData({ ...formData, includeInStats: e.target.checked })}
-                      className="accent-emerald-500"
+                      className="accent-white"
                     />
                     <span>Include in public stats</span>
                   </label>
@@ -589,6 +714,79 @@ export const AdminProjectsPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Case Study Deep-Dive Fields */}
+              <div className="pt-4 border-t border-dark-border space-y-4">
+                <span className="text-xs font-mono text-accent uppercase tracking-wider block">
+                  Case Study Details (Optional)
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-mono text-content-muted uppercase mb-1">
+                      Problem Statement
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={formData.problem}
+                      onChange={(e) => setFormData({ ...formData, problem: e.target.value })}
+                      placeholder="What challenge did this project solve?"
+                      className="w-full px-3 py-2 rounded-xl bg-dark-surface border border-dark-border text-white text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-mono text-content-muted uppercase mb-1">
+                      Engineered Solution
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={formData.solution}
+                      onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
+                      placeholder="How did you architect and build the solution?"
+                      className="w-full px-3 py-2 rounded-xl bg-dark-surface border border-dark-border text-white text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-mono text-content-muted uppercase mb-1">
+                      Key Features (One per line)
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={formData.features}
+                      onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                      placeholder="Role-based access control&#10;Real-time analytics dashboard"
+                      className="w-full px-3 py-2 rounded-xl bg-dark-surface border border-dark-border text-white text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-mono text-content-muted uppercase mb-1">
+                      Process &amp; Optimization Notes (One per line)
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={formData.processNotes}
+                      onChange={(e) => setFormData({ ...formData, processNotes: e.target.value })}
+                      placeholder="Reduced bundle size by 35% with route code splitting"
+                      className="w-full px-3 py-2 rounded-xl bg-dark-surface border border-dark-border text-white text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono text-content-muted uppercase mb-1">
+                    Showcase Screenshot URLs (One per line or comma-separated)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={formData.screenshots}
+                    onChange={(e) => setFormData({ ...formData, screenshots: e.target.value })}
+                    placeholder="https://example.com/screen1.png"
+                    className="w-full px-3 py-2 rounded-xl bg-dark-surface border border-dark-border text-white text-sm"
+                  />
+                </div>
+              </div>
+
               <div className="flex justify-end space-x-3 pt-4 border-t border-dark-border">
                 <button
                   type="button"
@@ -605,6 +803,172 @@ export const AdminProjectsPage: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Milestones & Deliverables Workspace Modal */}
+      {workspaceProject && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="max-w-3xl w-full glass-panel p-6 sm:p-8 rounded-3xl border border-dark-border my-8 space-y-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-dark-border pb-4">
+              <div>
+                <span className="text-xs font-mono text-accent uppercase tracking-wider block">
+                  PROJECT WORKSPACE
+                </span>
+                <h2 className="text-xl font-bold text-white">{workspaceProject.title}</h2>
+              </div>
+              <button
+                onClick={() => setWorkspaceProject(null)}
+                className="text-content-muted hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {workspaceLoading ? (
+              <div className="py-12 text-center text-sm text-content-muted animate-pulse">
+                Loading milestones and deliverables...
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Milestones Column */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-mono uppercase tracking-wider text-white flex items-center gap-2">
+                    <ListChecks className="w-4 h-4 text-accent" />
+                    <span>Milestones ({milestones.length})</span>
+                  </h3>
+
+                  <form onSubmit={handleAddMilestone} className="space-y-2 p-3.5 rounded-2xl bg-dark-surface border border-dark-border">
+                    <input
+                      type="text"
+                      required
+                      value={newMilestone.title}
+                      onChange={(e) => setNewMilestone({ ...newMilestone, title: e.target.value })}
+                      placeholder="Milestone title..."
+                      className="w-full px-3 py-2 rounded-xl bg-dark-card border border-dark-border text-white text-xs"
+                    />
+                    <input
+                      type="text"
+                      value={newMilestone.description}
+                      onChange={(e) => setNewMilestone({ ...newMilestone, description: e.target.value })}
+                      placeholder="Description (optional)..."
+                      className="w-full px-3 py-2 rounded-xl bg-dark-card border border-dark-border text-white text-xs"
+                    />
+                    <button
+                      type="submit"
+                      className="w-full py-2 rounded-xl bg-accent text-black font-semibold text-xs hover:bg-accent-hover"
+                    >
+                      + Add Milestone
+                    </button>
+                  </form>
+
+                  <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                    {milestones.length === 0 ? (
+                      <p className="text-xs text-content-muted py-4 text-center">No milestones yet.</p>
+                    ) : (
+                      milestones.map((m) => (
+                        <div
+                          key={m._id}
+                          className="p-3 rounded-xl bg-dark-card border border-dark-border flex items-center justify-between gap-2"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-semibold text-white truncate">{m.title}</p>
+                            {m.description && (
+                              <p className="text-[11px] text-content-muted truncate">{m.description}</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <select
+                              value={m.status}
+                              onChange={(e) =>
+                                handleMilestoneStatus(m, e.target.value as ProjectMilestone['status'])
+                              }
+                              className="px-2 py-1 rounded-lg bg-dark-surface border border-dark-border text-[11px] text-white font-mono"
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="in-progress">In Progress</option>
+                              <option value="completed">Completed</option>
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMilestone(m._id)}
+                              className="p-1 text-content-muted hover:text-red-400"
+                              title="Delete Milestone"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Files Column */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-mono uppercase tracking-wider text-white flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-accent" />
+                    <span>Deliverable Files ({files.length})</span>
+                  </h3>
+
+                  <form onSubmit={handleAddFile} className="space-y-2 p-3.5 rounded-2xl bg-dark-surface border border-dark-border">
+                    <input
+                      type="text"
+                      required
+                      value={newFile.name}
+                      onChange={(e) => setNewFile({ ...newFile, name: e.target.value })}
+                      placeholder="File label (e.g. Design System v1.pdf)"
+                      className="w-full px-3 py-2 rounded-xl bg-dark-card border border-dark-border text-white text-xs"
+                    />
+                    <input
+                      type="url"
+                      required
+                      value={newFile.url}
+                      onChange={(e) => setNewFile({ ...newFile, url: e.target.value })}
+                      placeholder="Download URL (https://...)"
+                      className="w-full px-3 py-2 rounded-xl bg-dark-card border border-dark-border text-white text-xs"
+                    />
+                    <button
+                      type="submit"
+                      className="w-full py-2 rounded-xl bg-accent text-black font-semibold text-xs hover:bg-accent-hover"
+                    >
+                      + Attach Deliverable
+                    </button>
+                  </form>
+
+                  <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                    {files.length === 0 ? (
+                      <p className="text-xs text-content-muted py-4 text-center">No files attached yet.</p>
+                    ) : (
+                      files.map((f) => (
+                        <div
+                          key={f._id}
+                          className="p-3 rounded-xl bg-dark-card border border-dark-border flex items-center justify-between gap-2"
+                        >
+                          <a
+                            href={f.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs font-semibold text-accent hover:underline truncate flex-1"
+                          >
+                            {f.name}
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteFile(f._id)}
+                            className="p-1 text-content-muted hover:text-red-400"
+                            title="Remove File"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

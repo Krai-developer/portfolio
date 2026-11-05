@@ -164,6 +164,8 @@ export const api = {
       request('/admin/dashboard'),
     getProjects: () =>
       request('/admin/projects'),
+    getProjectById: (id: string) =>
+      request(`/projects/id/${id}`),
     createProject: (data: any) =>
       request('/projects', { method: 'POST', data }),
     updateProject: (id: string, data: any) =>
