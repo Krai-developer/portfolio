@@ -43,6 +43,8 @@ export interface Milestone {
   createdAt: string;
 }
 
+export type ProjectMilestone = Milestone;
+
 export interface ProjectFile {
   _id: string;
   projectId: string | { _id: string; title: string };
