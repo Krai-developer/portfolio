@@ -85,7 +85,6 @@ export const AdminLayout: React.FC = () => {
             </div>
             <div>
               <span className="font-bold text-sm text-white block">KraiDev Admin</span>
-              <span className="text-[10px] font-mono text-accent block">SUPERUSER RBAC</span>
             </div>
           </Link>
           <Link to="/" className="text-content-muted hover:text-white p-1" title="View Public Website">
@@ -96,10 +95,10 @@ export const AdminLayout: React.FC = () => {
         {/* Admin profile snippet */}
         <div className="px-6 py-4 border-b border-dark-border/40 flex items-center space-x-3">
           <div className="w-9 h-9 rounded-full bg-dark-card border border-accent/40 overflow-hidden flex items-center justify-center font-bold text-white text-xs">
-            {user?.avatar ? (
+            {user?.avatar && !user.avatar.includes('photo-1534528741775-53994a69daeb') ? (
               <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
             ) : (
-              'A'
+              'MD'
             )}
           </div>
           <div className="overflow-hidden">

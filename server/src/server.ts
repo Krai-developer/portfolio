@@ -95,6 +95,10 @@ connectDB().then(async () => {
       { role: 'admin', name: 'Alex Rivera' },
       { $set: { name: 'Maron Jake Dinopol' } }
     ),
+    User.updateMany(
+      { role: 'admin', avatar: { $regex: 'photo-1534528741775-53994a69daeb' } },
+      { $set: { avatar: '' } }
+    ),
     Settings.updateMany(
       { name: 'Alex Rivera' },
       { $set: { name: 'Maron Jake Dinopol' } }
