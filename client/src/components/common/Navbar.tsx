@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
@@ -9,8 +9,7 @@ import {
   Shield,
   LayoutDashboard,
   LogOut,
-  User,
-  Sparkles
+  User
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -22,7 +21,8 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ settings }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, isClient, isAdmin, isVisitor, logout } = useAuth();
+  const [activeSection, setActiveSection] = useState<string>('');
+  const { isClient, isAdmin, isVisitor, logout } = useAuth();
   const location = useLocation();
 
   const isHome = location.pathname === '/';
@@ -33,11 +33,44 @@ export const Navbar: React.FC<NavbarProps> = ({ settings }) => {
     restDelta: 0.001
   });
 
+  useEffect(() => {
+    if (!isHome) {
+      setActiveSection('');
+      return;
+    }
+
+    const sectionIds = ['about', 'services', 'work', 'portal', 'contact'];
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 180;
+      if (window.scrollY < 260) {
+        setActiveSection('');
+        return;
+      }
+
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveSection(id);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isHome]);
+
   const navLinks = [
-    { name: 'About', href: isHome ? '#about' : '/#about' },
-    { name: 'Services', href: isHome ? '#services' : '/#services' },
-    { name: 'Work', href: isHome ? '#work' : '/#work' },
-    { name: 'Contact', href: isHome ? '#contact' : '/#contact' }
+    { name: 'About', id: 'about', href: isHome ? '#about' : '/#about' },
+    { name: 'Services', id: 'services', href: isHome ? '#services' : '/#services' },
+    { name: 'Work', id: 'work', href: isHome ? '#work' : '/#work' },
+    { name: 'Portal', id: 'portal', href: isHome ? '#portal' : '/#portal' },
+    { name: 'Contact', id: 'contact', href: isHome ? '#contact' : '/#contact' }
   ];
 
   return (
@@ -65,16 +98,30 @@ export const Navbar: React.FC<NavbarProps> = ({ settings }) => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-sm font-medium text-content-secondary hover:text-white transition-colors duration-150"
-              >
-                {link.name}
-              </a>
-            ))}
+          <nav className="hidden md:flex items-center space-x-2">
+            {navLinks.map((link) => {
+              const isActive = isHome && activeSection === link.id;
+              return (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className={`relative px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+                    isActive
+                      ? 'text-white'
+                      : 'text-content-secondary hover:text-white'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="navbar-active-pill"
+                      className="absolute inset-0 rounded-full bg-white/[0.08] border border-white/20 -z-10"
+                      transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+                    />
+                  )}
+                  {link.name}
+                </a>
+              );
+            })}
           </nav>
 
           {/* Right Action Area */}

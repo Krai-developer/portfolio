@@ -36,6 +36,7 @@
 
 /* Glassmorphism utility - seamless dark + white smoke blend */
 .glass-panel {
+  position: relative;
   background: linear-gradient(
     145deg,
     rgba(245, 245, 245, 0.055) 0%,
@@ -45,6 +46,31 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(245, 245, 245, 0.08);
+}
+
+/* Mouse-tracking White Smoke radial spotlight */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    550px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(245, 245, 245, 0.085),
+    transparent 45%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 0;
+}
+
+.spotlight-card:hover::before {
+  opacity: 1;
 }
 
 .glass-panel-subtle {

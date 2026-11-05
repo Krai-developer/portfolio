@@ -10,6 +10,12 @@ import {
 } from 'lucide-react';
 
 export const AboutBentoSection: React.FC = () => {
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  };
+
   return (
     <section id="about" className="relative pb-24 pt-8 sm:pt-10 lg:pt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,7 +49,8 @@ export const AboutBentoSection: React.FC = () => {
             viewport={{ once: true, amount: 0.15 }}
             whileHover={{ y: -4 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="lg:col-span-2 glass-panel p-8 rounded-2xl border border-dark-border relative overflow-hidden group"
+            onMouseMove={handleCardMouseMove}
+            className="lg:col-span-2 glass-panel spotlight-card p-8 rounded-2xl border border-dark-border relative overflow-hidden group"
           >
             <div className="absolute -top-10 -right-10 w-48 h-48 bg-accent/10 rounded-full blur-3xl group-hover:bg-accent/15 transition-all pointer-events-none" />
             <div className="w-12 h-12 rounded-xl bg-accent-muted border border-accent/30 flex items-center justify-center text-accent mb-6">
@@ -76,7 +83,8 @@ export const AboutBentoSection: React.FC = () => {
             viewport={{ once: true, amount: 0.15 }}
             whileHover={{ y: -4 }}
             transition={{ duration: 0.5, delay: 0.08, ease: 'easeOut' }}
-            className="glass-panel p-8 rounded-2xl border border-dark-border relative overflow-hidden group flex flex-col justify-between"
+            onMouseMove={handleCardMouseMove}
+            className="glass-panel spotlight-card p-8 rounded-2xl border border-dark-border relative overflow-hidden group flex flex-col justify-between"
           >
             <div>
               <div className="w-12 h-12 rounded-xl bg-accent-muted border border-accent/30 flex items-center justify-center text-accent mb-6">
@@ -100,7 +108,8 @@ export const AboutBentoSection: React.FC = () => {
             viewport={{ once: true, amount: 0.15 }}
             whileHover={{ y: -4 }}
             transition={{ duration: 0.5, delay: 0.16, ease: 'easeOut' }}
-            className="glass-panel p-8 rounded-2xl border border-dark-border relative overflow-hidden group flex flex-col justify-between"
+            onMouseMove={handleCardMouseMove}
+            className="glass-panel spotlight-card p-8 rounded-2xl border border-dark-border relative overflow-hidden group flex flex-col justify-between"
           >
             <div>
               <div className="w-12 h-12 rounded-xl bg-accent-muted border border-accent/30 flex items-center justify-center text-accent mb-6">
@@ -126,7 +135,8 @@ export const AboutBentoSection: React.FC = () => {
             viewport={{ once: true, amount: 0.15 }}
             whileHover={{ y: -4 }}
             transition={{ duration: 0.5, delay: 0.08, ease: 'easeOut' }}
-            className="glass-panel p-8 rounded-2xl border border-dark-border relative overflow-hidden group"
+            onMouseMove={handleCardMouseMove}
+            className="glass-panel spotlight-card p-8 rounded-2xl border border-dark-border relative overflow-hidden group"
           >
             <div className="w-12 h-12 rounded-xl bg-accent-muted border border-accent/30 flex items-center justify-center text-accent mb-6">
               <Layers className="w-6 h-6" />
@@ -145,7 +155,8 @@ export const AboutBentoSection: React.FC = () => {
             viewport={{ once: true, amount: 0.15 }}
             whileHover={{ y: -4 }}
             transition={{ duration: 0.5, delay: 0.16, ease: 'easeOut' }}
-            className="lg:col-span-3 glass-panel p-8 rounded-2xl border border-dark-border relative overflow-hidden group"
+            onMouseMove={handleCardMouseMove}
+            className="lg:col-span-3 glass-panel spotlight-card p-8 rounded-2xl border border-dark-border relative overflow-hidden group"
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div>

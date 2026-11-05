@@ -39,6 +39,12 @@ export const ServicesSection: React.FC = () => {
     }
   };
 
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  };
+
   return (
     <section id="services" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -78,7 +84,8 @@ export const ServicesSection: React.FC = () => {
                 viewport={{ once: true, amount: 0.15 }}
                 whileHover={{ y: -4 }}
                 transition={{ duration: 0.5, delay: index * 0.08, ease: 'easeOut' }}
-                className="glass-panel p-8 rounded-2xl border border-dark-border hover:border-accent/40 transition-all flex flex-col justify-between group relative overflow-hidden"
+                onMouseMove={handleCardMouseMove}
+                className="glass-panel spotlight-card p-8 rounded-2xl border border-dark-border hover:border-accent/40 transition-all flex flex-col justify-between group relative overflow-hidden"
               >
                 <div className="absolute -top-8 -right-8 w-36 h-36 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/15 transition-all pointer-events-none" />
                 <div>

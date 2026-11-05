@@ -33,6 +33,12 @@ export const ProjectsSection: React.FC = () => {
       ? projects
       : projects.filter((p) => p.category === activeCategory);
 
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  };
+
   return (
     <section id="work" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -95,10 +101,14 @@ export const ProjectsSection: React.FC = () => {
                 viewport={{ once: true, amount: 0.15 }}
                 whileHover={{ y: -4 }}
                 transition={{ duration: 0.5, delay: (index % 2) * 0.1, ease: 'easeOut' }}
-                className="glass-panel rounded-2xl border border-dark-border overflow-hidden hover:border-accent/40 transition-all group flex flex-col"
+                onMouseMove={handleCardMouseMove}
+                className="glass-panel spotlight-card rounded-2xl border border-dark-border overflow-hidden hover:border-accent/40 transition-all group flex flex-col"
               >
-                {/* Image Showcase */}
-                <div className="relative aspect-video w-full overflow-hidden bg-dark-surface">
+                {/* Image Showcase — Clickable to Case Study */}
+                <Link
+                  to={`/projects/${project.slug}`}
+                  className="relative aspect-video w-full overflow-hidden bg-dark-surface block"
+                >
                   {project.image ? (
                     <img
                       src={project.image}
@@ -107,8 +117,35 @@ export const ProjectsSection: React.FC = () => {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-content-muted font-mono text-sm">
-                      Interactive Preview
+                    <div className="w-full h-full flex flex-col justify-between p-5 bg-gradient-to-br from-[#14141C] via-[#0F0F15] to-[#0B0B0F]">
+                      <div className="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                        <div className="flex items-center space-x-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-white/10" />
+                        </div>
+                        <span className="text-[10px] font-mono text-content-muted truncate max-w-[180px]">
+                          {project.slug}.app
+                        </span>
+                      </div>
+                      <div className="my-auto py-4 text-center space-y-1.5">
+                        <p className="text-xs font-mono uppercase tracking-widest text-accent/80">
+                          {project.category}
+                        </p>
+                        <p className="text-lg font-bold text-white px-4 line-clamp-1">
+                          {project.title}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-center gap-1.5">
+                        {project.technologies.slice(0, 3).map((tech, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-0.5 rounded bg-white/[0.05] border border-white/10 text-[10px] font-mono text-content-secondary"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-dark-card via-transparent to-transparent opacity-80" />
@@ -117,14 +154,22 @@ export const ProjectsSection: React.FC = () => {
                       {project.category}
                     </span>
                   </div>
-                </div>
+                  <div className="absolute bottom-4 right-4 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                    <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-accent text-black font-semibold text-xs shadow-emerald-sm">
+                      <span>Read Case Study</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                </Link>
 
                 {/* Content */}
-                <div className="p-8 flex-1 flex flex-col justify-between space-y-6">
+                <div className="p-8 flex-1 flex flex-col justify-between space-y-6 relative z-10">
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-accent transition-colors">
-                      {project.title}
-                    </h3>
+                    <Link to={`/projects/${project.slug}`} className="block">
+                      <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-accent transition-colors">
+                        {project.title}
+                      </h3>
+                    </Link>
                     <p className="text-content-secondary text-sm leading-relaxed line-clamp-3">
                       {project.description}
                     </p>
