@@ -8,6 +8,7 @@ import { ProjectsSection } from '../../sections/ProjectsSection';
 import { ClientPortalPreviewSection } from '../../sections/ClientPortalPreviewSection';
 import { AvailabilitySection } from '../../sections/AvailabilitySection';
 import { ContactSection } from '../../sections/ContactSection';
+import { HybridCodeBackground } from '../../components/common/HybridCodeBackground';
 import { Settings } from '../../types';
 
 export const HomePage: React.FC = () => {
@@ -16,13 +17,18 @@ export const HomePage: React.FC = () => {
   return (
     <div>
       <HeroSection settings={settings} />
-      <AboutBentoSection />
-      <ServicesSection />
-      <ProjectsSection />
-      <ClientPortalPreviewSection />
-      <TechStackSection />
-      <AvailabilitySection settings={settings} />
-      <ContactSection />
+      <div className="relative overflow-hidden">
+        <HybridCodeBackground />
+        <div className="relative z-10">
+          <AboutBentoSection />
+          <ServicesSection />
+          <ProjectsSection />
+          <ClientPortalPreviewSection />
+          <TechStackSection />
+          <AvailabilitySection settings={settings} />
+          <ContactSection />
+        </div>
+      </div>
     </div>
   );
 };
