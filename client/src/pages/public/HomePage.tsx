@@ -5,7 +5,6 @@ import { AboutBentoSection } from '../../sections/AboutBentoSection';
 import { TechStackSection } from '../../sections/TechStackSection';
 import { ServicesSection } from '../../sections/ServicesSection';
 import { ProjectsSection } from '../../sections/ProjectsSection';
-import { ClientPortalPreviewSection } from '../../sections/ClientPortalPreviewSection';
 import { AvailabilitySection } from '../../sections/AvailabilitySection';
 import { ContactSection } from '../../sections/ContactSection';
 import { HybridCodeBackground } from '../../components/common/HybridCodeBackground';
@@ -23,7 +22,6 @@ export const HomePage: React.FC = () => {
           <AboutBentoSection />
           <ServicesSection />
           <ProjectsSection />
-          <ClientPortalPreviewSection />
           <TechStackSection />
           <AvailabilitySection settings={settings} />
           <ContactSection />

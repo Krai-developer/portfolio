@@ -39,7 +39,7 @@ export const Navbar: React.FC<NavbarProps> = ({ settings }) => {
       return;
     }
 
-    const sectionIds = ['about', 'services', 'work', 'portal', 'contact'];
+    const sectionIds = ['about', 'services', 'work', 'contact'];
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 180;
       if (window.scrollY < 260) {
@@ -69,7 +69,6 @@ export const Navbar: React.FC<NavbarProps> = ({ settings }) => {
     { name: 'About', id: 'about', href: isHome ? '#about' : '/#about' },
     { name: 'Services', id: 'services', href: isHome ? '#services' : '/#services' },
     { name: 'Work', id: 'work', href: isHome ? '#work' : '/#work' },
-    { name: 'Portal', id: 'portal', href: isHome ? '#portal' : '/#portal' },
     { name: 'Contact', id: 'contact', href: isHome ? '#contact' : '/#contact' }
   ];
 
