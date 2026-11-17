@@ -82,9 +82,9 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
  */
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password, confirmPassword } = req.body;
+    const { name, email, password, confirmPassword } = req.body || {};
 
-    if (!name || !email || !password) {
+    if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string' || !name.trim() || !email.trim() || !password) {
       res.status(400).json({ success: false, message: 'Please provide all required fields.' });
       return;
     }
@@ -94,12 +94,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (confirmPassword && password !== confirmPassword) {
+    if (confirmPassword !== undefined && password !== confirmPassword) {
       res.status(400).json({ success: false, message: 'Passwords do not match.' });
       return;
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const normalizedEmail = email.trim().toLowerCase();
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       res.status(400).json({ success: false, message: 'An account with that email already exists.' });
       return;
@@ -107,8 +108,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     // Role is strictly 'client' for public registration
     const user = await User.create({
-      name,
-      email: email.toLowerCase(),
+      name: name.trim(),
+      email: normalizedEmail,
       password,
       role: 'client'
     });
@@ -138,14 +139,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
  */
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password, portal } = req.body;
+    const { email, password, portal } = req.body || {};
 
-    if (!email || !password) {
+    if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password) {
       res.status(400).json({ success: false, message: 'Please provide email and password.' });
       return;
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password');
 
     if (!user) {
       res.status(401).json({ success: false, message: 'Invalid credentials.' });

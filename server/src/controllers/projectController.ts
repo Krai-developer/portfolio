@@ -4,6 +4,7 @@ import { ProjectMilestone } from '../models/ProjectMilestone';
 import { ProjectFile } from '../models/ProjectFile';
 import { Message } from '../models/Message';
 import { AuthRequest } from '../middleware/auth';
+import { isSafeHttpUrl } from '../utils/validation';
 
 const syncProjectProgressFromMilestones = async (projectId: any) => {
   const milestones = await ProjectMilestone.find({ projectId }).lean();
@@ -412,18 +413,26 @@ export const uploadProjectFile = async (req: AuthRequest, res: Response): Promis
     const { projectId } = req.params;
     const { name, url, type, size } = req.body;
 
-    if (!name || !url) {
+    if (typeof name !== 'string' || !name.trim() || typeof url !== 'string' || !url.trim()) {
       res.status(400).json({ success: false, message: 'File name and URL are required.' });
+      return;
+    }
+
+    if (!isSafeHttpUrl(url)) {
+      res.status(400).json({
+        success: false,
+        message: 'File URL must be a valid http:// or https:// URL.'
+      });
       return;
     }
 
     const file = await ProjectFile.create({
       projectId,
       uploadedBy: req.user!._id,
-      name,
-      url,
-      type: type || 'document',
-      size: size || 1024
+      name: name.trim(),
+      url: url.trim(),
+      type: typeof type === 'string' && type.trim() ? type.trim() : 'document',
+      size: typeof size === 'number' && size >= 0 ? size : 1024
     });
 
     res.status(201).json({ success: true, data: file });

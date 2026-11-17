@@ -12,6 +12,14 @@ import { requestPasswordReset, resetPassword } from '../controllers/authControll
 
 const router = Router();
 
+const authAttemptLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many authentication attempts. Please try again later.' }
+});
+
 const passwordResetLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 5,
@@ -20,8 +28,8 @@ const passwordResetLimiter = rateLimit({
   message: { success: false, message: 'Too many password reset attempts. Please try again later.' }
 });
 
-router.post('/register', register);
-router.post('/login', login);
+router.post('/register', authAttemptLimiter, register);
+router.post('/login', authAttemptLimiter, login);
 router.post('/forgot-password', passwordResetLimiter, requestPasswordReset);
 router.post('/reset-password', passwordResetLimiter, resetPassword);
 router.post('/logout', logout);

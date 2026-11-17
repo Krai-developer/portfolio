@@ -12,7 +12,7 @@ import {
   uploadProjectFile,
   deleteProjectFile
 } from '../controllers/projectController';
-import { authenticateUser, requireAdmin } from '../middleware/auth';
+import { authenticateUser, requireAdmin, checkProjectOwnership } from '../middleware/auth';
 
 const router = Router();
 
@@ -32,7 +32,7 @@ router.put('/milestones/:milestoneId', authenticateUser, requireAdmin, updateMil
 router.delete('/milestones/:milestoneId', authenticateUser, requireAdmin, deleteMilestone);
 
 // Files
-router.post('/:projectId/files', authenticateUser, uploadProjectFile);
+router.post('/:projectId/files', authenticateUser, checkProjectOwnership, uploadProjectFile);
 router.delete('/files/:fileId', authenticateUser, requireAdmin, deleteProjectFile);
 
 export default router;

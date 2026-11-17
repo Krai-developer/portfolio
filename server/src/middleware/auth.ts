@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User, IUser } from '../models/User';
 import { Project } from '../models/Project';
+import { getJwtSecret } from '../utils/token';
 
 // Extend Express Request to include authenticated user
 export interface AuthRequest extends Request {
@@ -12,8 +13,6 @@ interface JwtPayload {
   id: string;
   role: 'client' | 'admin';
 }
-
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_super_secret_jwt_key_2026';
 
 /**
  * Middleware: Authenticate user via HTTP-only cookie or Authorization header
@@ -39,7 +38,7 @@ export const authenticateUser = async (
       return;
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, getJwtSecret()) as JwtPayload;
 
     const user = await User.findById(decoded.id).select('+password');
     if (!user || !user.isActive) {

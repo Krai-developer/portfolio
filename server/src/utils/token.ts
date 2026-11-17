@@ -2,16 +2,24 @@ import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { IUser } from '../models/User';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_super_secret_jwt_key_2026';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+export const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET?.trim();
+  if (secret) return secret;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: JWT_SECRET environment variable must be set in production.');
+  }
+  return 'dev_super_secret_jwt_key_2026';
+};
+
 const isProduction = process.env.NODE_ENV === 'production';
 const cookieSameSite = isProduction ? ('none' as const) : ('lax' as const);
 
 export const sendTokenResponse = (user: IUser, statusCode: number, res: Response) => {
+  const expiresIn = (process.env.JWT_EXPIRES_IN || '7d') as jwt.SignOptions['expiresIn'];
   const token = jwt.sign(
     { id: user._id, role: user.role },
-    JWT_SECRET,
-    { expiresIn: '7d' }
+    getJwtSecret(),
+    { expiresIn }
   );
 
   const cookieOptions = {
