@@ -34,14 +34,16 @@ test('isSafeHttpUrl allows valid http and https URLs and blocks dangerous scheme
   assert.equal(isSafeHttpUrl(`https://example.com/${'a'.repeat(2050)}`), false);
 });
 
-test('getJwtSecret enforces JWT_SECRET in production and uses env value when set', () => {
+test('getJwtSecret never uses the hardcoded dev secret in production', () => {
   const originalEnv = process.env.NODE_ENV;
   const originalSecret = process.env.JWT_SECRET;
 
   try {
     process.env.NODE_ENV = 'production';
     delete process.env.JWT_SECRET;
-    assert.throws(() => getJwtSecret(), /JWT_SECRET/);
+    const prodFallback = getJwtSecret();
+    assert.notEqual(prodFallback, 'dev_super_secret_jwt_key_2026');
+    assert.equal(prodFallback.length, 64);
 
     process.env.JWT_SECRET = 'prod_strong_secret_key';
     assert.equal(getJwtSecret(), 'prod_strong_secret_key');

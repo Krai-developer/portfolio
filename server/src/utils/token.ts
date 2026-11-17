@@ -1,12 +1,21 @@
 import { Response } from 'express';
+import { randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { IUser } from '../models/User';
+
+let ephemeralProdSecret: string | null = null;
 
 export const getJwtSecret = (): string => {
   const secret = process.env.JWT_SECRET?.trim();
   if (secret) return secret;
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('FATAL: JWT_SECRET environment variable must be set in production.');
+    if (!ephemeralProdSecret) {
+      ephemeralProdSecret = randomBytes(32).toString('hex');
+      console.warn(
+        '[Security Warning] JWT_SECRET is not set in production. Using an ephemeral secret; set JWT_SECRET in your backend environment variables for persistent sessions.'
+      );
+    }
+    return ephemeralProdSecret;
   }
   return 'dev_super_secret_jwt_key_2026';
 };
