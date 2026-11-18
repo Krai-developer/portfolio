@@ -674,7 +674,7 @@ export const HybridCodeBackground: React.FC = () => {
     <div
       ref={containerRef}
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none"
+      className="pointer-events-none absolute inset-0 z-0 overflow-x-clip select-none"
     >
       {/* Seamless top feather mask right below HeroSection */}
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0B0B0F] via-[#0B0B0F]/90 to-transparent z-10" />

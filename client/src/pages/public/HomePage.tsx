@@ -16,7 +16,7 @@ export const HomePage: React.FC = () => {
   return (
     <div>
       <HeroSection settings={settings} />
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-x-clip">
         <HybridCodeBackground />
         <div className="relative z-10">
           <AboutBentoSection />
