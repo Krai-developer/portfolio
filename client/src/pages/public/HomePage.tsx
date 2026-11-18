@@ -7,7 +7,7 @@ import { ServicesSection } from '../../sections/ServicesSection';
 import { ProjectsSection } from '../../sections/ProjectsSection';
 import { AvailabilitySection } from '../../sections/AvailabilitySection';
 import { ContactSection } from '../../sections/ContactSection';
-import { HybridCodeBackground } from '../../components/common/HybridCodeBackground';
+import { AetherisBackground } from '../../components/common/AetherisBackground';
 import { Settings } from '../../types';
 
 export const HomePage: React.FC = () => {
@@ -17,7 +17,7 @@ export const HomePage: React.FC = () => {
     <div>
       <HeroSection settings={settings} />
       <div className="relative overflow-x-clip">
-        <HybridCodeBackground />
+        <AetherisBackground />
         <div className="relative z-10">
           <AboutBentoSection />
           <ServicesSection />
