@@ -7,6 +7,7 @@ import { ServicesSection } from '../../sections/ServicesSection';
 import { ProjectsSection } from '../../sections/ProjectsSection';
 import { AvailabilitySection } from '../../sections/AvailabilitySection';
 import { ContactSection } from '../../sections/ContactSection';
+import { Footer } from '../../components/common/Footer';
 import { AetherisBackground } from '../../components/common/AetherisBackground';
 import { Settings } from '../../types';
 
@@ -25,6 +26,7 @@ export const HomePage: React.FC = () => {
           <TechStackSection />
           <AvailabilitySection settings={settings} />
           <ContactSection />
+          <Footer settings={settings} />
         </div>
       </div>
     </div>

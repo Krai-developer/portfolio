@@ -40,7 +40,7 @@ export const PublicLayout: React.FC = () => {
       <main className="flex-1 relative z-10">
         <Outlet context={{ settings }} />
       </main>
-      <Footer settings={settings} />
+      {pathname !== '/' && <Footer settings={settings} />}
     </div>
   );
 };

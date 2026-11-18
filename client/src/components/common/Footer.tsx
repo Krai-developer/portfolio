@@ -9,7 +9,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ settings }) => {
   return (
-    <footer className="relative z-10 pt-16 pb-12 bg-gradient-to-b from-transparent via-[#0B0B0F]/80 to-[#0B0B0F]">
+    <footer className="relative z-10 pt-16 pb-12 bg-gradient-to-b from-transparent via-[#0B0B0F]/30 to-[#0B0B0F]/65">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-white/[0.06]">
           {/* Brand info */}
