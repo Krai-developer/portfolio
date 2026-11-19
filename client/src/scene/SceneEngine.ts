@@ -123,6 +123,7 @@ export class SceneEngine {
   private lastTimestamp = 0;
   private elapsed = 0;
   private disposed = false;
+  private paused = false;
 
   private boundResize: () => void;
   private boundPointerMove: (e: PointerEvent) => void;
@@ -162,10 +163,11 @@ export class SceneEngine {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.1;
-    this.renderer.setPixelRatio(this.isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 2));
+    // Cap pixelRatio at 1.25 for background WebGL canvas to prevent high-DPI fill-rate lag
+    this.renderer.setPixelRatio(this.isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 1.25));
     this.renderer.setSize(width, height);
     this.renderer.shadowMap.enabled = !this.isSoftwareGl;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.domElement.style.display = 'block';
     this.renderer.domElement.style.width = '100%';
     this.renderer.domElement.style.height = '100%';
@@ -210,8 +212,8 @@ export class SceneEngine {
     this.keyLight = new THREE.DirectionalLight(theme.keyLightColor, theme.keyLightIntensity);
     this.keyLight.position.set(12, 18, 11);
     this.keyLight.castShadow = !this.isSoftwareGl;
-    this.keyLight.shadow.mapSize.width = 2048;
-    this.keyLight.shadow.mapSize.height = 2048;
+    this.keyLight.shadow.mapSize.width = 1024;
+    this.keyLight.shadow.mapSize.height = 1024;
     const d = 16;
     this.keyLight.shadow.camera.left = -d;
     this.keyLight.shadow.camera.right = d;
@@ -255,8 +257,8 @@ export class SceneEngine {
     this.materials = createMaterialLibrary(this.textures, this.isSoftwareGl);
     this.audio = new SpatialAudioSynth();
 
-    // Sculpted Architectural Terrain Floor extending into horizon fog
-    this.floorGeo = new THREE.PlaneGeometry(140, 140, 96, 96);
+    // Sculpted Architectural Terrain Floor extending into horizon fog (64x64 for fast vertex shading)
+    this.floorGeo = new THREE.PlaneGeometry(140, 140, 64, 64);
     this.floorGeo.rotateX(-Math.PI / 2);
     this.floorMesh = new THREE.Mesh(this.floorGeo, this.materials.floorMaterial);
     this.floorMesh.receiveShadow = true;
@@ -511,8 +513,21 @@ export class SceneEngine {
     this.frameId = window.setTimeout(poll, 5);
   }
 
+  public setPaused(paused: boolean): void {
+    if (this.paused === paused || this.disposed) return;
+    this.paused = paused;
+    if (!paused) {
+      this.lastTimestamp = performance.now();
+      this.tick();
+    } else if (this.frameId) {
+      cancelAnimationFrame(this.frameId);
+      clearTimeout(this.frameId);
+      this.frameId = 0;
+    }
+  }
+
   private tick = (): void => {
-    if (this.disposed) return;
+    if (this.disposed || this.paused) return;
 
     const now = performance.now();
     const rawDt = Math.min(0.05, Math.max(0.001, (now - this.lastTimestamp) / 1000));

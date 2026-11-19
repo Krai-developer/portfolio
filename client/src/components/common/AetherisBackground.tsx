@@ -20,7 +20,8 @@ export const AetherisBackground: React.FC = () => {
 
   useEffect(() => {
     const container = canvasMountRef.current;
-    if (!container) return;
+    const wrapper = wrapperRef.current;
+    if (!container || !wrapper) return;
 
     const engine = new SceneEngine(container, DEFAULT_CONFIG, {
       onBeaconSelect: () => {},
@@ -28,7 +29,17 @@ export const AetherisBackground: React.FC = () => {
     });
     engineRef.current = engine;
 
+    // Pause WebGL render loop while user is at the Hero section (off-screen)
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        engine.setPaused(!entry.isIntersecting);
+      },
+      { rootMargin: '120px 0px' }
+    );
+    observer.observe(wrapper);
+
     return () => {
+      observer.disconnect();
       engine.dispose();
       engineRef.current = null;
     };

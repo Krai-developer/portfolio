@@ -40,11 +40,11 @@
   background: linear-gradient(
     145deg,
     rgba(245, 245, 245, 0.055) 0%,
-    rgba(21, 21, 27, 0.65) 50%,
-    rgba(11, 11, 15, 0.78) 100%
+    rgba(19, 21, 28, 0.78) 50%,
+    rgba(11, 11, 15, 0.86) 100%
   );
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(245, 245, 245, 0.08);
 }
 

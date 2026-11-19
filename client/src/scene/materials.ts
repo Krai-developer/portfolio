@@ -71,33 +71,27 @@ export function createMaterialLibrary(
     polygonOffsetUnits: -1,
   });
 
-  // 5. Core crystal (high-IOR transmissive optical crystal with software-GL fallback)
+  // 5. Core crystal (glossy optical crystal without expensive extra transmission render pass)
   const coreCrystal = new THREE.MeshPhysicalMaterial({
     color: initialFinish.coreColor,
-    metalness: 0.05,
+    metalness: 0.12,
     roughness: 0.06,
-    transmission: isSoftwareGl ? 0 : 0.92,
     transparent: true,
-    opacity: isSoftwareGl ? 0.52 : 1.0,
+    opacity: 0.68,
     ior: 1.75,
-    thickness: 1.6,
-    attenuationDistance: 1.8,
-    attenuationColor: new THREE.Color(initialFinish.coreAttenuation),
     clearcoat: 1.0,
     clearcoatRoughness: 0.05,
     envMapIntensity: 1.6,
   });
 
-  // 6. Outer optical glass dome (depthWrite: false for clean interior sorting)
+  // 6. Outer optical glass dome (depthWrite: false for clean interior sorting, zero transmission pass overhead)
   const glassDome = new THREE.MeshPhysicalMaterial({
     color: 0xeef6ff,
-    metalness: 0.0,
+    metalness: 0.05,
     roughness: 0.08,
-    transmission: isSoftwareGl ? 0 : 0.9,
     transparent: true,
-    opacity: isSoftwareGl ? 0.2 : 0.32,
+    opacity: isSoftwareGl ? 0.2 : 0.26,
     ior: 1.52,
-    thickness: 0.35,
     clearcoat: 1.0,
     clearcoatRoughness: 0.04,
     depthWrite: false,
