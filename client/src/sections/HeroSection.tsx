@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Settings } from '../types';
 import { HeroStats } from '../components/common/HeroStats';
 import { HeroVideoCarousel } from '../components/common/HeroVideoCarousel';
@@ -8,12 +8,6 @@ import { HeroVideoCarousel } from '../components/common/HeroVideoCarousel';
 interface HeroSectionProps {
   settings?: Settings | null;
 }
-
-const proofPoints = [
-  'React and TypeScript on the front end',
-  'Node.js and MongoDB behind the scenes',
-  'A client portal for project updates and files'
-];
 
 const oldDefaultHeadline = 'Engineering digital experiences that scale.';
 const oldDefaultDescription =
@@ -126,20 +120,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
             </a>
           </motion.div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-8 flex flex-col items-start gap-3 text-xs font-mono text-content-muted sm:flex-row sm:flex-wrap sm:gap-x-5 sm:gap-y-3"
-        >
-          {proofPoints.map((point) => (
-            <div key={point} className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-accent" />
-              <span>{point}</span>
-            </div>
-          ))}
-        </motion.div>
 
         <div className="mt-12 lg:mt-14">
           <HeroStats />
