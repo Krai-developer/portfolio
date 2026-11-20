@@ -40,29 +40,34 @@ export const Navbar: React.FC<NavbarProps> = ({ settings }) => {
     }
 
     const sectionIds = ['about', 'services', 'work', 'contact'];
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 180;
-      if (window.scrollY < 260) {
-        setActiveSection('');
-        return;
-      }
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
 
-      for (const id of sectionIds) {
-        const el = document.getElementById(id);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(id);
-            break;
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
           }
         }
-      }
-    };
+      },
+      { rootMargin: '-35% 0px -55% 0px', threshold: 0 }
+    );
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    elements.forEach((el) => observer.observe(el));
+
+    const handleTopReset = () => {
+      if (window.scrollY < 220) setActiveSection('');
+    };
+    window.addEventListener('scroll', handleTopReset, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', handleTopReset);
+    };
   }, [isHome]);
 
   const navLinks = [
@@ -73,7 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({ settings }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/[0.05] bg-gradient-to-b from-[#0B0B0F]/90 to-[#0B0B0F]/70 backdrop-blur-xl transition-all duration-300">
+    <header className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-[#0B0B0F]/95 transition-colors duration-300">
       <motion.div
         style={{ scaleX }}
         className="pointer-events-none absolute inset-x-0 bottom-0 h-[1.5px] origin-left bg-gradient-to-r from-white/10 via-[#F5F5F5]/80 to-white/30"

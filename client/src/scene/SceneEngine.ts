@@ -123,6 +123,7 @@ export class SceneEngine {
   private elapsed = 0;
   private disposed = false;
   private paused = false;
+  private colorsDirty = true;
 
   private boundResize: () => void;
   private boundPointerMove: (e: PointerEvent) => void;
@@ -162,8 +163,8 @@ export class SceneEngine {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.22;
-    // Crisp 1.25x DPR cap balances razor-sharp metallic edges with 60fps+ smoothness
-    this.renderer.setPixelRatio(this.isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 1.25));
+    // Keep DPR at 1.0 for zero-stutter scrolling even on high-DPI laptops
+    this.renderer.setPixelRatio(1);
     this.renderer.setSize(width, height);
     // Disable full-scene shadow pass (central plinth already uses soft contactShadowMesh)
     this.renderer.shadowMap.enabled = false;
@@ -661,12 +662,17 @@ export class SceneEngine {
       _mat4.compose(_vec3, _quat, _vec3B);
       mesh.setMatrixAt(i, _mat4);
 
-      const accentBlend = THREE.MathUtils.clamp(ptrInfluence * 0.72 + shockLift * 0.42, 0, 1);
-      _color.copy(_baseColor).multiplyScalar(inst.baseTintFactor).lerp(_hiColor, accentBlend);
-      mesh.setColorAt(i, _color);
+      if (this.colorsDirty || this.pointerActive || this.shockwaves.length > 0) {
+        const accentBlend = THREE.MathUtils.clamp(ptrInfluence * 0.72 + shockLift * 0.42, 0, 1);
+        _color.copy(_baseColor).multiplyScalar(inst.baseTintFactor).lerp(_hiColor, accentBlend);
+        mesh.setColorAt(i, _color);
+      }
     }
     mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    if (mesh.instanceColor && (this.colorsDirty || this.pointerActive || this.shockwaves.length > 0)) {
+      mesh.instanceColor.needsUpdate = true;
+      this.colorsDirty = false;
+    }
 
     // 7. Update Atmospheric Motes (zero GC)
     const motePos = this.motes.positions;

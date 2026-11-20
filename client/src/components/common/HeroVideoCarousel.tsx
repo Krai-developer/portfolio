@@ -25,10 +25,32 @@ export const HeroVideoCarousel: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [targetIndex, setTargetIndex] = useState<number | null>(null);
   const [readyIndex, setReadyIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const activeVideoRef = useRef<HTMLVideoElement>(null);
   const nextVideoRef = useRef<HTMLVideoElement>(null);
   const nextIndex = videos.length
     ? targetIndex ?? (activeIndex + 1) % videos.length
     : 0;
+
+  // Pause Hero video decoding when scrolled past Hero so GPU stays free for the 3D background
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const vid = activeVideoRef.current;
+        if (!vid) return;
+        if (entry.isIntersecting) {
+          vid.play().catch(() => {});
+        } else {
+          vid.pause();
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [activeIndex]);
 
   useEffect(() => {
     if (targetIndex === null || readyIndex !== targetIndex) return;
@@ -68,6 +90,7 @@ export const HeroVideoCarousel: React.FC = () => {
   return (
     <>
       <div
+        ref={containerRef}
         className="absolute inset-0 -z-10 h-full w-full overflow-hidden"
         aria-roledescription="carousel"
         aria-label="Portfolio videos"
@@ -80,7 +103,7 @@ export const HeroVideoCarousel: React.FC = () => {
           return (
             <video
               key={video.src}
-              ref={isNext && !isActive ? nextVideoRef : undefined}
+              ref={isActive ? activeVideoRef : isNext ? nextVideoRef : undefined}
               className={`absolute inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ${
                 isActive ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
