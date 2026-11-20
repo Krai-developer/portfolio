@@ -83,18 +83,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
               Let&apos;s Talk
             </a>
           </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-7 text-sm font-mono tracking-wide text-cyan-200/90 sm:text-base"
-          >
-            I&apos;m Maron Jake Dinopol
-          </motion.p>
         </div>
 
-        <div className="mt-10 lg:mt-12">
+        <div className="mt-14 lg:mt-16">
           <HeroStats />
         </div>
       </div>
