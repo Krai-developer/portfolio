@@ -161,9 +161,9 @@ export class SceneEngine {
     });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.15;
-    // Cap pixelRatio at 1.0 for ultra-smooth 60fps+ background WebGL rendering on all screens
-    this.renderer.setPixelRatio(1);
+    this.renderer.toneMappingExposure = 1.22;
+    // Crisp 1.25x DPR cap balances razor-sharp metallic edges with 60fps+ smoothness
+    this.renderer.setPixelRatio(this.isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 1.25));
     this.renderer.setSize(width, height);
     // Disable full-scene shadow pass (central plinth already uses soft contactShadowMesh)
     this.renderer.shadowMap.enabled = false;
@@ -220,9 +220,18 @@ export class SceneEngine {
     );
     this.scene.add(this.hemiLight);
 
-    this.rimLight = new THREE.DirectionalLight(theme.rimLightColor, theme.rimLightIntensity * 1.15);
+    this.rimLight = new THREE.DirectionalLight(theme.rimLightColor, theme.rimLightIntensity * 1.25);
     this.rimLight.position.set(-14, 9, -14);
     this.scene.add(this.rimLight);
+
+    // Lightweight warm core glow & cool studio back-fill for realistic metallic specular depth
+    const coreGlowLight = new THREE.PointLight(0xffcf7d, 5.2, 18, 1.7);
+    coreGlowLight.position.set(0, 3.1, 0);
+    this.scene.add(coreGlowLight);
+
+    const coolBackLight = new THREE.PointLight(0x60a5fa, 2.8, 26, 1.6);
+    coolBackLight.position.set(-8, 5.5, -7);
+    this.scene.add(coolBackLight);
 
     // Procedural Textures & PBR Materials
     const maxAnisotropy = Math.min(4, this.renderer.capabilities.getMaxAnisotropy());

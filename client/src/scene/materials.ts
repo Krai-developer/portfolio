@@ -36,9 +36,9 @@ export function createMaterialLibrary(
     roughnessMap: textures.brushedRoughness,
     anisotropy: initialFinish.primaryAnisotropy,
     anisotropyRotation: Math.PI * 0.25,
-    clearcoat: 0.25,
-    clearcoatRoughness: 0.3,
-    envMapIntensity: 1.25,
+    clearcoat: 0.45,
+    clearcoatRoughness: 0.18,
+    envMapIntensity: 1.65,
   });
 
   // 2. Secondary matte structural material (plinth, cradle, inner housings)
@@ -71,17 +71,19 @@ export function createMaterialLibrary(
     polygonOffsetUnits: -1,
   });
 
-  // 5. Core crystal (glossy optical crystal without expensive extra transmission render pass)
+  // 5. Core crystal (luminous glossy optical crystal without expensive extra transmission render pass)
   const coreCrystal = new THREE.MeshPhysicalMaterial({
     color: initialFinish.coreColor,
-    metalness: 0.12,
-    roughness: 0.06,
+    emissive: new THREE.Color(initialFinish.coreAttenuation),
+    emissiveIntensity: 0.55,
+    metalness: 0.14,
+    roughness: 0.05,
     transparent: true,
-    opacity: 0.68,
+    opacity: 0.78,
     ior: 1.75,
     clearcoat: 1.0,
-    clearcoatRoughness: 0.05,
-    envMapIntensity: 1.6,
+    clearcoatRoughness: 0.04,
+    envMapIntensity: 2.0,
   });
 
   // 6. Outer optical glass dome (depthWrite: false for clean interior sorting, zero transmission pass overhead)
@@ -115,13 +117,14 @@ export function createMaterialLibrary(
     metalness: 0.1,
   });
 
-  // 8. Sculpted architectural floor with PBR + onBeforeCompile subtle contour ripple
+  // 8. Sculpted architectural floor (honed dark obsidian stone catching metallic reflections)
   const floorMaterial = new THREE.MeshStandardMaterial({
     color: initialTheme.floorColor,
     map: textures.floorGrid,
-    roughness: 0.72,
-    metalness: 0.18,
-    envMapIntensity: 0.75,
+    roughnessMap: textures.brushedRoughness,
+    roughness: 0.44,
+    metalness: 0.46,
+    envMapIntensity: 1.25,
   });
 
   floorMaterial.onBeforeCompile = (shader) => {
@@ -151,13 +154,13 @@ export function createMaterialLibrary(
     );
   };
 
-  // 9. Monolith field material (uses instanceColor tinting)
+  // 9. Monolith field material (anodized dark metallic sheen catching warm & cool speculars)
   const pillarMaterial = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.42,
-    metalness: 0.38,
+    roughness: 0.30,
+    metalness: 0.68,
     roughnessMap: textures.brushedRoughness,
-    envMapIntensity: 1.0,
+    envMapIntensity: 1.35,
   });
 
   // 10. Floating dust motes
@@ -169,11 +172,11 @@ export function createMaterialLibrary(
     metalness: 0.4,
   });
 
-  // 11. Contact shadow plane material
+  // 11. Contact shadow plane material (grounds the central plinth realistically without shadow-map pass)
   const contactShadowMaterial = new THREE.MeshBasicMaterial({
     map: textures.contactShadow,
     transparent: true,
-    opacity: 0.55,
+    opacity: 0.72,
     depthWrite: false,
   });
 
