@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { SpatialAudioSynth } from './audio';
 import { createMaterialLibrary, type SceneMaterialLibrary } from './materials';
 import {
@@ -162,12 +161,12 @@ export class SceneEngine {
     });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.1;
-    // Cap pixelRatio at 1.25 for background WebGL canvas to prevent high-DPI fill-rate lag
-    this.renderer.setPixelRatio(this.isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 1.25));
+    this.renderer.toneMappingExposure = 1.15;
+    // Cap pixelRatio at 1.0 for ultra-smooth 60fps+ background WebGL rendering on all screens
+    this.renderer.setPixelRatio(1);
     this.renderer.setSize(width, height);
-    this.renderer.shadowMap.enabled = !this.isSoftwareGl;
-    this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    // Disable full-scene shadow pass (central plinth already uses soft contactShadowMesh)
+    this.renderer.shadowMap.enabled = false;
     this.renderer.domElement.style.display = 'block';
     this.renderer.domElement.style.width = '100%';
     this.renderer.domElement.style.height = '100%';
@@ -208,57 +207,31 @@ export class SceneEngine {
     this.controls.update();
     this.renderer.domElement.style.touchAction = 'pan-y';
 
-    // 3-Point Studio PBR Lighting + Softboxes
-    this.keyLight = new THREE.DirectionalLight(theme.keyLightColor, theme.keyLightIntensity);
+    // 3-Point Studio PBR Lighting (skip expensive per-fragment RectAreaLight LTC shaders)
+    this.keyLight = new THREE.DirectionalLight(theme.keyLightColor, theme.keyLightIntensity * 1.1);
     this.keyLight.position.set(12, 18, 11);
-    this.keyLight.castShadow = !this.isSoftwareGl;
-    this.keyLight.shadow.mapSize.width = 1024;
-    this.keyLight.shadow.mapSize.height = 1024;
-    const d = 16;
-    this.keyLight.shadow.camera.left = -d;
-    this.keyLight.shadow.camera.right = d;
-    this.keyLight.shadow.camera.top = d;
-    this.keyLight.shadow.camera.bottom = -d;
-    this.keyLight.shadow.camera.near = 1;
-    this.keyLight.shadow.camera.far = 52;
-    this.keyLight.shadow.bias = -0.0005;
-    this.keyLight.shadow.normalBias = 0.02;
+    this.keyLight.castShadow = false;
     this.scene.add(this.keyLight);
 
     this.hemiLight = new THREE.HemisphereLight(
       theme.hemiSkyColor,
       theme.hemiGroundColor,
-      theme.hemiIntensity,
+      theme.hemiIntensity * 1.18,
     );
     this.scene.add(this.hemiLight);
 
-    this.rimLight = new THREE.DirectionalLight(theme.rimLightColor, theme.rimLightIntensity);
+    this.rimLight = new THREE.DirectionalLight(theme.rimLightColor, theme.rimLightIntensity * 1.15);
     this.rimLight.position.set(-14, 9, -14);
     this.scene.add(this.rimLight);
 
-    if (!this.isSoftwareGl) {
-      RectAreaLightUniformsLib.init();
-      const softboxA = new THREE.RectAreaLight(0xfff1dd, 4.5, 8, 4);
-      softboxA.position.set(7, 8, 7);
-      softboxA.lookAt(0, 2.5, 0);
-      this.scene.add(softboxA);
-      this.rectLights.push(softboxA);
-
-      const softboxB = new THREE.RectAreaLight(0x9bc7ff, 3.2, 8, 4);
-      softboxB.position.set(-8, 6, -6);
-      softboxB.lookAt(0, 2.5, 0);
-      this.scene.add(softboxB);
-      this.rectLights.push(softboxB);
-    }
-
     // Procedural Textures & PBR Materials
-    const maxAnisotropy = this.renderer.capabilities.getMaxAnisotropy();
+    const maxAnisotropy = Math.min(4, this.renderer.capabilities.getMaxAnisotropy());
     this.textures = createProceduralTextures(maxAnisotropy);
     this.materials = createMaterialLibrary(this.textures, this.isSoftwareGl);
     this.audio = new SpatialAudioSynth();
 
-    // Sculpted Architectural Terrain Floor extending into horizon fog (64x64 for fast vertex shading)
-    this.floorGeo = new THREE.PlaneGeometry(140, 140, 64, 64);
+    // Sculpted Architectural Terrain Floor extending into horizon fog (32x32 for ultra-fast vertex shading)
+    this.floorGeo = new THREE.PlaneGeometry(140, 140, 32, 32);
     this.floorGeo.rotateX(-Math.PI / 2);
     this.floorMesh = new THREE.Mesh(this.floorGeo, this.materials.floorMaterial);
     this.floorMesh.receiveShadow = true;

@@ -45,26 +45,42 @@ export const AetherisBackground: React.FC = () => {
     };
   }, []);
 
-  // Synchronize scroll progress strictly across the About -> Contact wrapper
+  // Synchronize scroll progress strictly across the About -> Contact wrapper (rAF-throttled)
   useEffect(() => {
-    const handleScroll = () => {
+    let rafPending = false;
+    let cachedHeight = wrapperRef.current?.offsetHeight || 1;
+
+    const updateScroll = () => {
+      rafPending = false;
       const wrapper = wrapperRef.current;
       if (!wrapper) return;
 
       const rect = wrapper.getBoundingClientRect();
-      const totalScrollable = Math.max(1, wrapper.offsetHeight - window.innerHeight);
+      const totalScrollable = Math.max(1, cachedHeight - window.innerHeight);
       const scrolledIntoWrapper = Math.max(0, -rect.top);
       const progress = Math.min(1, Math.max(0, scrolledIntoWrapper / totalScrollable));
 
       engineRef.current?.setScrollProgress(progress);
     };
 
-    handleScroll();
+    const handleScroll = () => {
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(updateScroll);
+      }
+    };
+
+    const handleResize = () => {
+      cachedHeight = wrapperRef.current?.offsetHeight || 1;
+      handleScroll();
+    };
+
+    updateScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -80,7 +96,7 @@ export const AetherisBackground: React.FC = () => {
       {/* Pinned Aetheris 3D Kinetic WebGL Canvas from About to Contact */}
       <div
         ref={canvasMountRef}
-        className="sticky top-0 h-screen w-full"
+        className="sticky top-0 h-screen w-full will-change-transform"
         aria-label="Interactive 3D kinetic background scene"
       />
     </div>
