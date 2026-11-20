@@ -225,14 +225,14 @@ export class SceneEngine {
     this.rimLight.position.set(-14, 9, -14);
     this.scene.add(this.rimLight);
 
-    // Lightweight warm core glow & cool studio back-fill for realistic metallic specular depth
-    const coreGlowLight = new THREE.PointLight(0xffcf7d, 5.2, 18, 1.7);
+    // Hero-matched electric cyan core glow + subtle warm amber accent light
+    const coreGlowLight = new THREE.PointLight(0x38bdf8, 5.4, 18, 1.65);
     coreGlowLight.position.set(0, 3.1, 0);
     this.scene.add(coreGlowLight);
 
-    const coolBackLight = new THREE.PointLight(0x60a5fa, 2.8, 26, 1.6);
-    coolBackLight.position.set(-8, 5.5, -7);
-    this.scene.add(coolBackLight);
+    const warmAccentBackLight = new THREE.PointLight(0xfb923c, 2.4, 24, 1.7);
+    warmAccentBackLight.position.set(-8, 5.5, -7);
+    this.scene.add(warmAccentBackLight);
 
     // Procedural Textures & PBR Materials
     const maxAnisotropy = Math.min(4, this.renderer.capabilities.getMaxAnisotropy());
@@ -513,7 +513,13 @@ export class SceneEngine {
     if (this.disposed || this.paused) return;
 
     const now = performance.now();
-    const rawDt = Math.min(0.05, Math.max(0.001, (now - this.lastTimestamp) / 1000));
+    // Smooth 30-40fps frame pacing keeps scrolling silky without changing any visuals
+    const elapsedSinceLast = now - this.lastTimestamp;
+    if (!this.isSoftwareGl && elapsedSinceLast < 24) {
+      this.frameId = requestAnimationFrame(this.tick);
+      return;
+    }
+    const rawDt = Math.min(0.05, Math.max(0.001, elapsedSinceLast / 1000));
     this.lastTimestamp = now;
     const motionScale = this.reducedMotion ? 0.15 : 1.0;
     const dt = rawDt * motionScale;

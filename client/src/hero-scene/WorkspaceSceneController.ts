@@ -82,9 +82,9 @@ export function mountWorkspaceScene(
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.18;
-  renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 2));
-  renderer.shadowMap.enabled = !isSoftwareGl;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // Cap DPR at 1.25 and skip shadow-map pass so Hero + scroll transition stays silky smooth
+  renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 1.25));
+  renderer.shadowMap.enabled = false;
 
   const initWidth = Math.max(container.clientWidth, 320);
   const initHeight = Math.max(container.clientHeight, 320);

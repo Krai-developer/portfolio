@@ -4,7 +4,7 @@ import { type SceneConfig } from '../../scene/types';
 
 const DEFAULT_CONFIG: SceneConfig = {
   atmosphere: 'obsidian',
-  finish: 'gold',
+  finish: 'sapphire',
   cameraPreset: 'overview',
   explode: 0,
   waveEnergy: 0.75,
@@ -34,7 +34,7 @@ export const AetherisBackground: React.FC = () => {
       ([entry]) => {
         engine.setPaused(!entry.isIntersecting);
       },
-      { rootMargin: '120px 0px' }
+      { rootMargin: '0px' }
     );
     observer.observe(wrapper);
 
@@ -90,8 +90,8 @@ export const AetherisBackground: React.FC = () => {
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-0 overflow-x-clip select-none"
     >
-      {/* Seamless top feather mask right below HeroSection */}
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0B0B0F] via-[#0B0B0F]/85 to-transparent z-10" />
+      {/* Seamless top feather mask right below HeroSection matching midnight sapphire */}
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#030d20] via-[#030d20]/85 to-transparent z-10" />
 
       {/* Pinned Aetheris 3D Kinetic WebGL Canvas from About to Contact */}
       <div

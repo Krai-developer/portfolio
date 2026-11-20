@@ -26,7 +26,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#0B0B0F] via-[#0B0B0F]/85 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#030d20] via-[#030d20]/85 to-transparent"
         aria-hidden="true"
       />
 
