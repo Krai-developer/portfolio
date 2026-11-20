@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -107,7 +108,36 @@ export function mountWorkspaceScene(
   scene.environmentIntensity = 0.24;
   pmremGenerator.dispose();
 
-  const camera = new THREE.PerspectiveCamera(44, initWidth / initHeight, 0.1, 45);
+  const camera = new THREE.PerspectiveCamera(46, initWidth / initHeight, 0.1, 45);
+  const isCompactInit = initWidth / Math.max(initHeight, 1) < 1.15;
+  camera.position.set(
+    isCompactInit ? -0.32 : -1.18,
+    isCompactInit ? 1.68 : 1.66,
+    isCompactInit ? 7.8 : 6.45,
+  );
+
+  // Constrained OrbitControls so users can smoothly drag to inspect the 3D workspace
+  // while keeping mouse-wheel dedicated to smooth portfolio scrolling
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(isCompactInit ? 0.0 : -0.15, 1.62, -0.24);
+  controls.enablePan = false;
+  controls.enableZoom = false;
+  controls.enableDamping = !isSoftwareGl;
+  controls.dampingFactor = 0.055;
+  controls.rotateSpeed = 0.62;
+  controls.minDistance = 4.2;
+  controls.maxDistance = isCompactInit ? 8.6 : 7.8;
+  controls.minPolarAngle = Math.PI * 0.37;
+  controls.maxPolarAngle = Math.PI * 0.55;
+  controls.minAzimuthAngle = -Math.PI * 0.26;
+  controls.maxAzimuthAngle = Math.PI * 0.14;
+  controls.update();
+  renderer.domElement.style.touchAction = 'pan-y';
+
+  let userOrbited = false;
+  controls.addEventListener('start', () => {
+    userOrbited = true;
+  });
 
   // =========================================================================
   // SAPPHIRE-CYAN + WARM-AMBER CINEMATIC LIGHTING RIG
@@ -305,20 +335,25 @@ export function mountWorkspaceScene(
       reducedMotion,
     );
 
-    const camLambda = isSoftwareGl ? 10 : 5.2;
-    camera.position.x = dampValue(camera.position.x, desired.position.x, camLambda, dt);
-    camera.position.y = dampValue(camera.position.y, desired.position.y, camLambda, dt);
-    camera.position.z = dampValue(camera.position.z, desired.position.z, camLambda, dt);
+    if (userOrbited) {
+      controls.update();
+    } else {
+      const camLambda = isSoftwareGl ? 10 : 5.2;
+      camera.position.x = dampValue(camera.position.x, desired.position.x, camLambda, dt);
+      camera.position.y = dampValue(camera.position.y, desired.position.y, camLambda, dt);
+      camera.position.z = dampValue(camera.position.z, desired.position.z, camLambda, dt);
 
-    currentTarget.x = dampValue(currentTarget.x, desired.target.x, camLambda, dt);
-    currentTarget.y = dampValue(currentTarget.y, desired.target.y, camLambda, dt);
-    currentTarget.z = dampValue(currentTarget.z, desired.target.z, camLambda, dt);
-    camera.lookAt(currentTarget);
+      currentTarget.x = dampValue(currentTarget.x, desired.target.x, camLambda, dt);
+      currentTarget.y = dampValue(currentTarget.y, desired.target.y, camLambda, dt);
+      currentTarget.z = dampValue(currentTarget.z, desired.target.z, camLambda, dt);
+      controls.target.copy(currentTarget);
+      controls.update();
 
-    const nextFov = dampValue(camera.fov, desired.fov, 5.0, dt);
-    if (Math.abs(nextFov - camera.fov) > 0.01) {
-      camera.fov = nextFov;
-      camera.updateProjectionMatrix();
+      const nextFov = dampValue(camera.fov, desired.fov, 5.0, dt);
+      if (Math.abs(nextFov - camera.fov) > 0.01) {
+        camera.fov = nextFov;
+        camera.updateProjectionMatrix();
+      }
     }
 
     // Smooth lighting & fog depth changes across scroll + subtle idle breathing
@@ -481,6 +516,7 @@ export function mountWorkspaceScene(
       resizeObserver.disconnect();
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
       renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
+      controls.dispose();
       composer?.dispose();
       environment.dispose();
       workstation.dispose();

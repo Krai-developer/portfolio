@@ -72,8 +72,8 @@ export const HeroWorkspace3D: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 -z-10 h-full w-full overflow-hidden bg-[#030d20]"
+      aria-label="Interactive 3D Developer Workspace"
+      className="absolute inset-0 z-0 h-full w-full overflow-hidden bg-[#030d20] cursor-grab active:cursor-grabbing"
     >
       {webglError && (
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(14,165,233,0.24),rgba(3,13,32,0.98)_65%)]" />

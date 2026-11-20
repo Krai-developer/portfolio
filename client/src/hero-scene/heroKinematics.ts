@@ -98,11 +98,10 @@ export function computeScrollCameraPose(
     baseFov = isCompact ? 52 : 44;
   } else {
     // Full-frame centered diagonal 3/4 composition matching the reference image edge-to-edge
-    // (left warm amber strip & plant, floating hex-cube, central workstation, right pyramid,
-    // warm orb, ergonomic chair, and right warm-lit architectural shelving).
-    basePos = isCompact ? { x: -0.32, y: 1.72, z: 7.25 } : { x: -1.48, y: 1.72, z: 5.05 };
-    baseTarget = isCompact ? { x: 0.0, y: 1.68, z: -0.24 } : { x: -0.18, y: 1.72, z: -0.24 };
-    baseFov = isCompact ? 52 : 45;
+    // (pulled back cleanly so full desk, legs, chair, warm amber bar, and right shelves are visible)
+    basePos = isCompact ? { x: -0.32, y: 1.68, z: 7.8 } : { x: -1.18, y: 1.66, z: 6.45 };
+    baseTarget = isCompact ? { x: 0.0, y: 1.62, z: -0.24 } : { x: -0.15, y: 1.62, z: -0.24 };
+    baseFov = isCompact ? 52 : 46;
   }
 
   // Scroll choreography: glide forward and gently orbit across the holographic workspace.

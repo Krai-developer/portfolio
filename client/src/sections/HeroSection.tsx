@@ -30,13 +30,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 my-auto">
+      <div className="pointer-events-none relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 my-auto">
         <div className="max-w-xl flex flex-col items-start text-left">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-cyan-400/30 bg-[#081426]/80 px-4 py-2 text-xs font-mono text-content-secondary shadow-card-dark"
+            className="pointer-events-auto inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-cyan-400/30 bg-[#081426]/80 px-4 py-2 text-xs font-mono text-content-secondary shadow-card-dark"
           >
             <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
             <span className="font-medium text-white">Software Engineer &amp; AI Engineer</span>
@@ -67,7 +67,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-8 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center"
+            className="pointer-events-auto mt-8 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center"
           >
             <a
               href="#work"
@@ -85,7 +85,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
           </motion.div>
         </div>
 
-        <div className="mt-14 lg:mt-16">
+        <div className="pointer-events-auto mt-14 lg:mt-16">
           <HeroStats />
         </div>
       </div>
