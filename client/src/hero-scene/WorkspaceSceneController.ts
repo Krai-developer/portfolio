@@ -111,15 +111,15 @@ export function mountWorkspaceScene(
   const camera = new THREE.PerspectiveCamera(46, initWidth / initHeight, 0.1, 45);
   const isCompactInit = initWidth / Math.max(initHeight, 1) < 1.15;
   camera.position.set(
-    isCompactInit ? -0.32 : -1.18,
+    isCompactInit ? -0.32 : -2.05,
     isCompactInit ? 1.68 : 1.66,
-    isCompactInit ? 7.8 : 6.45,
+    isCompactInit ? 7.8 : 6.55,
   );
 
   // Constrained OrbitControls so users can smoothly drag to inspect the 3D workspace
   // while keeping mouse-wheel dedicated to smooth portfolio scrolling
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.target.set(isCompactInit ? 0.0 : -0.15, 1.62, -0.24);
+  controls.target.set(isCompactInit ? 0.0 : -1.15, 1.62, -0.24);
   controls.enablePan = false;
   controls.enableZoom = false;
   controls.enableDamping = !isSoftwareGl;

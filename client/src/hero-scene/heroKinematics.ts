@@ -97,10 +97,9 @@ export function computeScrollCameraPose(
     baseTarget = isCompact ? { x: 0.05, y: 2.15, z: -0.3 } : { x: 0.0, y: 2.28, z: -0.32 };
     baseFov = isCompact ? 52 : 44;
   } else {
-    // Full-frame centered diagonal 3/4 composition matching the reference image edge-to-edge
-    // (pulled back cleanly so full desk, legs, chair, warm amber bar, and right shelves are visible)
-    basePos = isCompact ? { x: -0.32, y: 1.68, z: 7.8 } : { x: -1.18, y: 1.66, z: 6.45 };
-    baseTarget = isCompact ? { x: 0.0, y: 1.62, z: -0.24 } : { x: -0.15, y: 1.62, z: -0.24 };
+    // Full-frame diagonal 3/4 composition shifted right so Hero typography on the left stays clean
+    basePos = isCompact ? { x: -0.32, y: 1.68, z: 7.8 } : { x: -2.05, y: 1.66, z: 6.55 };
+    baseTarget = isCompact ? { x: 0.0, y: 1.62, z: -0.24 } : { x: -1.15, y: 1.62, z: -0.24 };
     baseFov = isCompact ? 52 : 46;
   }
 
