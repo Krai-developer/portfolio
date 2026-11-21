@@ -5,6 +5,7 @@ import { sendTokenResponse, clearTokenResponse } from '../utils/token';
 import { AuthRequest } from '../middleware/auth';
 import { createHash, randomBytes } from 'crypto';
 import { sendPasswordResetEmail } from '../services/emailService';
+import { isSafeHttpUrl } from '../utils/validation';
 
 const hashResetToken = (token: string): string => createHash('sha256').update(token).digest('hex');
 
@@ -255,11 +256,21 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-    const { name, avatar, company, phone, location, bio, website } = req.body;
+    const { name, avatar, company, phone, location, bio, website } = req.body || {};
+
+    if (avatar !== undefined && avatar !== '' && !isSafeHttpUrl(avatar)) {
+      res.status(400).json({ success: false, message: 'Avatar must be a valid http:// or https:// URL.' });
+      return;
+    }
+
+    if (website !== undefined && website !== '' && !isSafeHttpUrl(website)) {
+      res.status(400).json({ success: false, message: 'Website must be a valid http:// or https:// URL.' });
+      return;
+    }
 
     // Update User model fields (Clients cannot change their own role or isActive!)
-    if (name) req.user.name = name;
-    if (avatar !== undefined) req.user.avatar = avatar;
+    if (typeof name === 'string' && name.trim()) req.user.name = name.trim();
+    if (typeof avatar === 'string') req.user.avatar = avatar.trim();
     await req.user.save();
 
     let profile = null;

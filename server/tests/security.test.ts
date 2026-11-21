@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import { isSafeHttpUrl } from '../src/utils/validation';
 import { getJwtSecret } from '../src/utils/token';
 import { requireAdmin, requireClient, checkProjectOwnership, AuthRequest } from '../src/middleware/auth';
-import { login, register } from '../src/controllers/authController';
+import { login, register, updateProfile } from '../src/controllers/authController';
 import { uploadProjectFile } from '../src/controllers/projectController';
+import { updateUserRole } from '../src/controllers/adminController';
+import { sanitizeObject } from '../src/middleware/sanitize';
 import { Project } from '../src/models/Project';
 
 const createMockRes = () => {
@@ -184,4 +186,54 @@ test('uploadProjectFile rejects javascript: URLs with 400', async () => {
   );
   assert.equal(res.statusCode, 400);
   assert.match(res.body.message, /http:\/\/ or https:\/\//i);
+});
+
+test('sanitizeObject strips NoSQL operators, dotted keys, and prototype pollution keys', () => {
+  const malicious = JSON.parse(
+    '{"email":"ok@test.com","$ne":"","nested":{"$gt":0,"a.b":1,"safe":"yes"},"__proto__":{"polluted":true},"constructor":{"bad":1}}'
+  );
+  const cleaned = sanitizeObject(malicious) as Record<string, any>;
+  assert.equal(cleaned.email, 'ok@test.com');
+  assert.equal('$ne' in cleaned, false);
+  assert.equal('$gt' in cleaned.nested, false);
+  assert.equal('a.b' in cleaned.nested, false);
+  assert.equal(cleaned.nested.safe, 'yes');
+  assert.equal(Object.prototype.hasOwnProperty.call(cleaned, '__proto__'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(cleaned, 'constructor'), false);
+});
+
+test('updateProfile rejects javascript: URLs for website and avatar', async () => {
+  const resWebsite = createMockRes();
+  await updateProfile(
+    {
+      user: { _id: 'u1', role: 'client', save: async () => {} },
+      body: { website: 'javascript:alert(1)' }
+    } as unknown as AuthRequest,
+    resWebsite
+  );
+  assert.equal(resWebsite.statusCode, 400);
+
+  const resAvatar = createMockRes();
+  await updateProfile(
+    {
+      user: { _id: 'u1', role: 'client', save: async () => {} },
+      body: { avatar: 'data:text/html,<script>alert(1)</script>' }
+    } as unknown as AuthRequest,
+    resAvatar
+  );
+  assert.equal(resAvatar.statusCode, 400);
+});
+
+test('updateUserRole rejects invalid roles outside admin/client enum', async () => {
+  const res = createMockRes();
+  await updateUserRole(
+    {
+      params: { id: 'other-user' },
+      user: { _id: 'admin-1', role: 'admin' },
+      body: { role: 'superadmin' }
+    } as unknown as AuthRequest,
+    res
+  );
+  assert.equal(res.statusCode, 400);
+  assert.match(res.body.message, /Invalid role/i);
 });

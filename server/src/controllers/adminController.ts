@@ -7,7 +7,6 @@ import { ContactMessage } from '../models/ContactMessage';
 import { Message } from '../models/Message';
 import { Service } from '../models/Service';
 import { Skill } from '../models/Skill';
-import bcrypt from 'bcryptjs';
 
 /**
  * @route   GET /api/admin/dashboard
@@ -145,7 +144,13 @@ export const createClient = async (req: AuthRequest, res: Response): Promise<voi
       success: true,
       message: 'Client account created successfully.',
       data: {
-        ...client.toObject(),
+        _id: client._id,
+        name: client.name,
+        email: client.email,
+        role: client.role,
+        avatar: client.avatar,
+        isActive: client.isActive,
+        createdAt: client.createdAt,
         profile
       }
     });
@@ -173,12 +178,12 @@ export const updateClient = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    if (name) client.name = name;
-    if (email) client.email = email.toLowerCase();
+    if (typeof name === 'string' && name.trim()) client.name = name.trim();
+    if (typeof email === 'string' && email.trim()) client.email = email.trim().toLowerCase();
     if (typeof isActive === 'boolean') client.isActive = isActive;
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      client.password = await bcrypt.hash(password, salt);
+    if (typeof password === 'string' && password.length >= 6) {
+      // UserSchema.pre('save') hashes the password automatically (avoid double-hashing!)
+      client.password = password;
     }
     await client.save();
 
@@ -232,6 +237,11 @@ export const updateUserRole = async (req: AuthRequest, res: Response): Promise<v
     const { id } = req.params;
     const { role, isActive } = req.body;
 
+    if (role !== undefined && role !== 'admin' && role !== 'client') {
+      res.status(400).json({ success: false, message: 'Invalid role specified.' });
+      return;
+    }
+
     if (id === req.user!._id.toString() && role && role !== 'admin') {
       res.status(400).json({ success: false, message: 'Cannot demote your own admin account.' });
       return;
@@ -243,7 +253,7 @@ export const updateUserRole = async (req: AuthRequest, res: Response): Promise<v
         ...(role && { role }),
         ...(typeof isActive === 'boolean' && { isActive })
       },
-      { new: true }
+      { new: true, runValidators: true }
     ).select('-password');
 
     if (!updatedUser) {

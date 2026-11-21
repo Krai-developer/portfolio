@@ -2,10 +2,13 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import { User } from './models/User';
 import { Settings } from './models/Settings';
+import { sanitizeInput } from './middleware/sanitize';
 
 // Route imports
 import authRoutes from './routes/authRoutes';
@@ -23,6 +26,19 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+
+// Enable Mongoose query filter sanitization & trust reverse proxy for accurate IP rate limiting
+mongoose.set('sanitizeFilter', true);
+app.set('trust proxy', 1);
+
+// Global API rate limiter (protects against abuse & DoS)
+const globalApiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests from this IP. Please try again later.' }
+});
 
 // Security Middlewares
 app.use(
@@ -44,6 +60,8 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
+app.use(sanitizeInput);
+app.use('/api', globalApiLimiter);
 
 // Health Check
 app.get('/api/health', (_req: Request, res: Response) => {
@@ -78,7 +96,11 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('[Server Error]', err);
 
   const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal Server Error';
+  const isProd = process.env.NODE_ENV === 'production';
+  const message =
+    isProd && statusCode >= 500
+      ? 'Internal Server Error'
+      : err.message || 'Internal Server Error';
 
   res.status(statusCode).json({
     success: false,
