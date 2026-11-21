@@ -15,6 +15,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
     ? availabilityPeriod
     : `${availabilityPeriod} Openings`;
 
+  const professionalTitle = settings?.title?.trim() || 'Software Engineer & AI Engineer';
+  const heroHeadline = settings?.heroHeadline?.trim() || "Hi, I'm Maron Jake Dinopol.";
+  const heroDescription =
+    settings?.heroDescription?.trim() ||
+    'I build intelligent software that turns complex business problems into simple, scalable products.';
+
+  const renderHeadline = () => {
+    const match = heroHeadline.match(/^(Hi,\s*I['’]m\s+)(.+)$/i);
+    if (match) {
+      return (
+        <>
+          {match[1]}
+          <span className="emerald-gradient-text">{match[2]}</span>
+        </>
+      );
+    }
+    return heroHeadline;
+  };
+
   return (
     <section className="relative overflow-hidden pb-16 pt-8 sm:pb-20 sm:pt-12 lg:pb-24 lg:pt-14 min-h-[88vh] flex flex-col justify-between">
       {/* Interactive 3D Developer Workspace Environment */}
@@ -39,7 +58,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
             className="pointer-events-auto inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-cyan-400/30 bg-[#081426]/80 px-4 py-2 text-xs font-mono text-content-secondary shadow-card-dark"
           >
             <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="font-medium text-white">Software Engineer &amp; AI Engineer</span>
+            <span className="font-medium text-white">{professionalTitle}</span>
             <span className="text-content-muted" aria-hidden="true">·</span>
             <span className="text-cyan-300">{availability}</span>
           </motion.div>
@@ -50,7 +69,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="mt-7 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl"
           >
-            Hi, I&apos;m <span className="emerald-gradient-text">Maron Jake Dinopol.</span>
+            {renderHeadline()}
           </motion.h1>
 
           <motion.p
@@ -59,8 +78,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mt-6 max-w-lg text-lg leading-relaxed text-slate-300 sm:text-xl"
           >
-            I build intelligent software that turns complex business problems into simple,
-            scalable products.
+            {heroDescription}
           </motion.p>
 
           <motion.div

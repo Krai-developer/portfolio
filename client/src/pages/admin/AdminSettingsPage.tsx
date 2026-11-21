@@ -16,11 +16,11 @@ import {
 export const AdminSettingsPage: React.FC = () => {
   const [settings, setSettings] = useState<Settings>({
     name: 'Maron Jake Dinopol',
-    title: 'Freelance Developer & Computer Engineering Student',
+    title: 'Software Engineer & AI Engineer',
     bio: '',
-    heroHeadline: 'I turn ideas into working websites.',
+    heroHeadline: "Hi, I'm Maron Jake Dinopol.",
     heroDescription:
-      'I’m a Computer Engineering student and freelance developer. I work with you to plan, build, and polish websites and web apps, and keep you in the loop along the way.',
+      'I build intelligent software that turns complex business problems into simple, scalable products.',
     availabilityStatus: 'Available for Projects',
     availabilityPeriod: 'Q4 2026',
     typicalResponseTime: 'Within 24 hours',
@@ -49,19 +49,7 @@ export const AdminSettingsPage: React.FC = () => {
       try {
         const res = await api.public.getSettings();
         if (res.success && res.data) {
-          setSettings({
-            ...res.data,
-            title: ['Freelance Full-Stack Developer & CS Student', 'Full-Stack Developer & CS Student', 'Freelance Developer & CS Student'].includes(res.data.title)
-              ? 'Freelance Developer & Computer Engineering Student'
-              : res.data.title,
-            heroHeadline: res.data.heroHeadline === 'Engineering digital experiences that scale.'
-              ? 'I turn ideas into working websites.'
-              : res.data.heroHeadline,
-            heroDescription: res.data.heroDescription ===
-              'Freelance Full-Stack Developer & student building modern, scalable digital experiences with thoughtful UI and production-ready technology.'
-              ? 'I’m a Computer Engineering student and freelance developer. I work with you to plan, build, and polish websites and web apps, and keep you in the loop along the way.'
-              : res.data.heroDescription
-          });
+          setSettings(res.data);
         }
       } catch (err) {
         console.error('Failed to load settings:', err);
