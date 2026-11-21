@@ -164,6 +164,9 @@ export interface Settings {
     twitter?: string;
     dribbble?: string;
   };
+  resumeUrl?: string;
+  resumeFileName?: string;
+  resumeUpdatedAt?: string | null;
   learningStartDate?: string;
   dedicationPercentage?: number;
   statsPublic?: boolean;

@@ -56,6 +56,9 @@ const ClientProfilePage = lazy(() =>
 const ClientProjectRequestPage = lazy(() =>
   import('./pages/client/ClientProjectRequestPage').then((m) => ({ default: m.ClientProjectRequestPage }))
 );
+const ClientResumePage = lazy(() =>
+  import('./pages/client/ClientResumePage').then((m) => ({ default: m.ClientResumePage }))
+);
 
 // Lazy-loaded Admin Pages
 const AdminDashboardPage = lazy(() =>
@@ -117,6 +120,7 @@ export function App() {
               <Route path="projects/:id" element={<ClientProjectDetailPage />} />
               <Route path="request-project" element={<ClientProjectRequestPage />} />
               <Route path="files" element={<ClientFilesPage />} />
+              <Route path="resume" element={<ClientResumePage />} />
               <Route path="messages" element={<ClientMessagesPage />} />
               <Route path="profile" element={<ClientProfilePage />} />
             </Route>

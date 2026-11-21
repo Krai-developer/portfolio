@@ -7,6 +7,7 @@ import {
   CirclePlus,
   MessageSquare,
   FileText,
+  ScrollText,
   User,
   LogOut,
   Menu,
@@ -45,6 +46,7 @@ export const ClientLayout: React.FC = () => {
     { name: 'Request a Project', href: '/client/request-project', icon: CirclePlus },
     { name: 'Messages', href: '/client/messages', icon: MessageSquare },
     { name: 'Files', href: '/client/files', icon: FileText },
+    { name: 'Resume / CV', href: '/client/resume', icon: ScrollText },
     { name: 'Profile', href: '/client/profile', icon: User }
   ];
 

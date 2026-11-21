@@ -18,6 +18,9 @@ export interface ISettings extends Document {
     twitter?: string;
     dribbble?: string;
   };
+  resumeUrl?: string;
+  resumeFileName?: string;
+  resumeUpdatedAt?: Date | null;
   learningStartDate?: Date;
   dedicationPercentage: number;
   statsPublic: boolean;
@@ -84,6 +87,18 @@ const SettingsSchema = new Schema<ISettings>(
       linkedin: { type: String, default: 'https://linkedin.com' },
       twitter: { type: String, default: 'https://twitter.com' },
       dribbble: { type: String, default: 'https://dribbble.com' }
+    },
+    resumeUrl: {
+      type: String,
+      default: ''
+    },
+    resumeFileName: {
+      type: String,
+      default: ''
+    },
+    resumeUpdatedAt: {
+      type: Date,
+      default: null
     },
     learningStartDate: { type: Date, default: null },
     dedicationPercentage: { type: Number, min: 0, max: 100, default: 100 },

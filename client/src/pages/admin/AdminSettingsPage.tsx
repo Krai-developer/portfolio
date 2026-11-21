@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../services/api';
 import { Settings } from '../../types';
-import { Settings as SettingsIcon, CheckCircle2, AlertCircle, Save, Globe } from 'lucide-react';
+import {
+  Settings as SettingsIcon,
+  CheckCircle2,
+  AlertCircle,
+  Save,
+  Globe,
+  FileText,
+  Upload,
+  Trash2,
+  ExternalLink
+} from 'lucide-react';
 
 export const AdminSettingsPage: React.FC = () => {
   const [settings, setSettings] = useState<Settings>({
@@ -61,6 +71,31 @@ export const AdminSettingsPage: React.FC = () => {
     };
     fetchSettings();
   }, []);
+
+  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      setError('Please upload a valid PDF (.pdf) file for your Resume / CV.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Resume PDF must be 5 MB or smaller.');
+      return;
+    }
+    setError(null);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setSettings((prev) => ({
+          ...prev,
+          resumeUrl: reader.result as string,
+          resumeFileName: file.name
+        }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -349,6 +384,111 @@ export const AdminSettingsPage: React.FC = () => {
               className="w-full px-4 py-2.5 rounded-xl bg-dark-surface border border-dark-border text-white text-sm"
             />
           </div>
+        </div>
+
+        {/* Resume / CV Management (Visible to Clients in Client Portal) */}
+        <h3 className="text-lg font-bold text-white border-b border-dark-border pb-3 pt-4 flex items-center space-x-2">
+          <FileText className="w-4 h-4 text-accent" />
+          <span>Resume / CV (Visible to Clients)</span>
+        </h3>
+
+        <div className="space-y-4">
+          <p className="text-xs text-content-secondary">
+            Upload your PDF Resume/CV (max 5 MB) or paste an external link (Google Drive / PDF URL).
+            Logged-in clients can view and download it from their Client Portal.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+            <div>
+              <label className="block text-xs font-mono uppercase text-content-muted mb-2">
+                Upload PDF File
+              </label>
+              <label className="flex items-center justify-center space-x-2 w-full px-4 py-3 rounded-xl bg-dark-surface border border-dashed border-dark-border hover:border-accent/60 text-sm text-content-secondary hover:text-white cursor-pointer transition-all">
+                <Upload className="w-4 h-4 text-accent" />
+                <span>Choose PDF Resume (Max 5 MB)</span>
+                <input
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  onChange={handleResumeUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            <div>
+              <label className="block text-xs font-mono uppercase text-content-muted mb-2">
+                Or External Resume / CV URL
+              </label>
+              <input
+                type="url"
+                value={
+                  settings.resumeUrl?.startsWith('data:application/pdf;base64,')
+                    ? ''
+                    : settings.resumeUrl || ''
+                }
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    resumeUrl: e.target.value,
+                    resumeFileName: e.target.value ? 'Resume / CV Link' : ''
+                  })
+                }
+                placeholder="https://drive.google.com/file/d/.../view"
+                className="w-full px-4 py-2.5 rounded-xl bg-dark-surface border border-dark-border text-white text-sm"
+              />
+            </div>
+          </div>
+
+          {settings.resumeUrl && (
+            <div className="p-4 rounded-xl bg-dark-surface/80 border border-accent/30 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center space-x-3 min-w-0">
+                <div className="w-9 h-9 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center text-accent flex-shrink-0">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-white truncate">
+                    {settings.resumeFileName || 'Resume / CV Configured'}
+                  </p>
+                  <p className="text-[11px] font-mono text-content-muted">
+                    {settings.resumeUrl.startsWith('data:application/pdf;base64,')
+                      ? 'Uploaded PDF ready (click Save Settings to publish)'
+                      : 'External URL ready (click Save Settings to publish)'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <a
+                  href={settings.resumeUrl}
+                  download={
+                    settings.resumeUrl.startsWith('data:application/pdf;base64,')
+                      ? settings.resumeFileName || 'Resume.pdf'
+                      : undefined
+                  }
+                  target={
+                    settings.resumeUrl.startsWith('data:application/pdf;base64,')
+                      ? undefined
+                      : '_blank'
+                  }
+                  rel="noreferrer"
+                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-dark-card border border-dark-border hover:border-accent text-xs text-white transition-all"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-accent" />
+                  <span>Preview</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSettings({ ...settings, resumeUrl: '', resumeFileName: '' })
+                  }
+                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-xs text-red-400 transition-all"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Remove</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="pt-4 border-t border-dark-border flex justify-end">
