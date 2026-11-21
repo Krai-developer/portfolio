@@ -34,8 +34,8 @@ export const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({ settin
                 <span className="text-accent">{settings?.availabilityPeriod || 'Q4 2026'}</span>.
               </h3>
               <p className="text-content-secondary text-sm max-w-xl leading-relaxed">
-                Whether you need a high-converting startup landing page, an end-to-end full-stack
-                MVP, or a custom internal client portal, let's schedule an initial discovery call.
+                Need a website, full-stack web app, or custom client portal? Send over your idea
+                and we&apos;ll plan the next steps together.
               </p>
 
               <div className="pt-2 flex flex-wrap items-center gap-6 text-xs font-mono text-content-secondary">
@@ -56,7 +56,7 @@ export const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({ settin
                 href="#contact"
                 className="inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-xl bg-accent text-black font-semibold text-sm hover:bg-accent-hover shadow-emerald-sm transition-all text-center"
               >
-                <span>Initiate Project Inquiry</span>
+                <span>Start a Project</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a

@@ -58,8 +58,7 @@ export const ProjectsSection: React.FC = () => {
               Selected client &amp; studio projects.
             </h2>
             <p className="text-content-secondary text-base">
-              A curated selection of production web applications engineered with modern UI patterns,
-              type-safe APIs, and high performance.
+              Recent web apps and client projects I&apos;ve designed and built.
             </p>
           </div>
 

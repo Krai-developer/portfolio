@@ -80,7 +80,7 @@ export const TechStackSection: React.FC = () => {
             Curated modern stack.
           </h2>
           <p className="text-content-secondary text-base">
-            Every layer selected for performance, developer velocity, and maintainability.
+            The tools and frameworks I use day-to-day to build and ship software.
           </p>
         </motion.div>
 

@@ -63,8 +63,7 @@ export const ServicesSection: React.FC = () => {
             How we can collaborate.
           </h2>
           <p className="text-content-secondary text-base">
-            High-impact freelance engagements designed for fast delivery, clean architecture, and
-            delightful user experience.
+            From landing pages to full-stack web apps, built cleanly and shipped on schedule.
           </p>
         </motion.div>
 

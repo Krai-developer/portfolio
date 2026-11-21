@@ -24,11 +24,11 @@ export const AdminSettingsPage: React.FC = () => {
     availabilityStatus: 'Available for Projects',
     availabilityPeriod: 'Q4 2026',
     typicalResponseTime: 'Within 24 hours',
-    email: 'alex@rivera.dev',
-    phone: '+1 (415) 890-4321',
-    location: 'San Francisco, CA / Remote',
+    email: 'cloudyuu124@gmail.com',
+    phone: '',
+    location: 'Remote',
     socialLinks: {
-      github: 'https://github.com',
+      github: 'https://github.com/ForFunn-gg',
       linkedin: 'https://linkedin.com',
       twitter: 'https://twitter.com',
       dribbble: 'https://dribbble.com'

@@ -76,11 +76,11 @@ const SettingsSchema = new Schema<ISettings>(
     },
     phone: {
       type: String,
-      default: '+1 (555) 234-5678'
+      default: ''
     },
     location: {
       type: String,
-      default: 'San Francisco, CA / Remote'
+      default: 'Remote'
     },
     socialLinks: {
       github: { type: String, default: 'https://github.com/ForFunn-gg' },

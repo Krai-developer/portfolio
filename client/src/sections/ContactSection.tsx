@@ -99,7 +99,7 @@ export const ContactSection: React.FC = () => {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g. Sarah Jenkins"
+                    placeholder="Your full name"
                     className="w-full px-4 py-3.5 rounded-xl bg-dark-surface border border-dark-border focus:border-accent focus:outline-none text-white text-sm placeholder:text-content-muted"
                   />
                 </div>
@@ -112,7 +112,7 @@ export const ContactSection: React.FC = () => {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="sarah@company.com"
+                    placeholder="you@example.com"
                     className="w-full px-4 py-3.5 rounded-xl bg-dark-surface border border-dark-border focus:border-accent focus:outline-none text-white text-sm placeholder:text-content-muted"
                   />
                 </div>
@@ -127,7 +127,7 @@ export const ContactSection: React.FC = () => {
                   rows={4}
                   value={formData.projectBrief}
                   onChange={(e) => setFormData({ ...formData, projectBrief: e.target.value })}
-                  placeholder="Outline your project scope, target timeline, key feature requirements, or link to Figma wireframes..."
+                  placeholder="Tell me what you're building, your timeline, or any links you'd like to share..."
                   className="w-full px-4 py-3.5 rounded-xl bg-dark-surface border border-dark-border focus:border-accent focus:outline-none text-white text-sm placeholder:text-content-muted resize-none"
                 />
               </div>
