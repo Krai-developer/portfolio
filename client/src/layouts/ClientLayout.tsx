@@ -58,10 +58,10 @@ export const ClientLayout: React.FC = () => {
         <div className="h-20 flex items-center px-6 border-b border-dark-border/60 justify-between">
           <Link to="/" className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg bg-accent/20 border border-accent/40 flex items-center justify-center text-accent font-mono font-bold text-sm">
-              MD
+              KD
             </div>
             <div>
-              <span className="font-bold text-sm text-white block">Maron Jake Dinopol</span>
+              <span className="font-bold text-sm text-white block">KraiDev</span>
               <span className="text-[10px] font-mono text-accent block">CLIENT PORTAL</span>
             </div>
           </Link>
